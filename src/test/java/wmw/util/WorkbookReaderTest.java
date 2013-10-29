@@ -1,5 +1,3 @@
-package wmw.util;
-
 /**
  *
  * @author Wei-Ming Wu
@@ -20,6 +18,7 @@ package wmw.util;
  * the License.
  *
  */
+package wmw.util;
 
 import static net.sf.rubycollect4j.RubyCollections.Hash;
 import static net.sf.rubycollect4j.RubyCollections.ra;
