@@ -28,7 +28,6 @@ import static net.sf.rubycollect4j.RubyCollections.range;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,6 @@ import net.sf.rubycollect4j.RubyArray;
 import net.sf.rubycollect4j.RubyLazyEnumerator;
 import net.sf.rubycollect4j.block.TransformBlock;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
@@ -56,6 +54,9 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
  * 
  */
 public final class WorkbookReader {
+
+  private static final Logger logger = Logger.getLogger(WorkbookReader.class
+      .getName());
 
   private NPOIFSFileSystem npoifs = null;
   private OPCPackage pkg = null;
@@ -133,7 +134,7 @@ public final class WorkbookReader {
   public WorkbookReader(Workbook wb) {
     this.wb = wb;
     sheet = wb.getSheetAt(0);
-    this.hasHeader = true;
+    hasHeader = true;
     setHeader();
   }
 
@@ -160,15 +161,12 @@ public final class WorkbookReader {
       try {
         pkg = OPCPackage.open(file);
         wb = WorkbookFactory.create(pkg);
-      } catch (InvalidFormatException e) {
-        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
-        throw new RuntimeException(e);
-      } catch (IOException e) {
-        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
+      } catch (Exception e) {
+        logger.log(Level.SEVERE, null, e);
         throw new RuntimeException(e);
       }
     } catch (IOException e) {
-      Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
+      logger.log(Level.SEVERE, null, e);
       throw new RuntimeException(e);
     }
   }
@@ -181,7 +179,7 @@ public final class WorkbookReader {
       try {
         npoifs.close();
       } catch (IOException e) {
-        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
+        logger.log(Level.SEVERE, null, e);
         throw new RuntimeException(e);
       }
     }
@@ -189,7 +187,7 @@ public final class WorkbookReader {
       try {
         pkg.close();
       } catch (IOException e) {
-        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
+        logger.log(Level.SEVERE, null, e);
         throw new RuntimeException(e);
       }
     }
@@ -221,7 +219,7 @@ public final class WorkbookReader {
     if (isClosed)
       throw new IllegalStateException("Workbook has been closed.");
 
-    return new ArrayList<String>(header);
+    return header.each().toA();
   }
 
   /**
@@ -242,7 +240,7 @@ public final class WorkbookReader {
     if (isClosed)
       throw new IllegalStateException("Workbook has been closed.");
 
-    List<String> sheets = new ArrayList<String>();
+    List<String> sheets = newRubyArray();
     for (int i = 0; i < wb.getNumberOfSheets(); i++) {
       sheets.add(wb.getSheetName(i));
     }
@@ -392,19 +390,16 @@ public final class WorkbookReader {
     if (!hasHeader)
       throw new IllegalStateException("Header not found!");
 
-    RubyLazyEnumerator<Map<String, String>> mapsIterable =
-        newRubyLazyEnumerator(sheet).map(
-            new TransformBlock<Row, Map<String, String>>() {
+    return newRubyLazyEnumerator(sheet).map(
+        new TransformBlock<Row, Map<String, String>>() {
 
-              @SuppressWarnings("unchecked")
-              @Override
-              public Map<String, String> yield(Row item) {
-                return Hash(ra(getHeader()).zip(rowToRubyArray(item)));
-              }
+          @SuppressWarnings("unchecked")
+          @Override
+          public Map<String, String> yield(Row item) {
+            return Hash(ra(getHeader()).zip(rowToRubyArray(item)));
+          }
 
-            });
-
-    return mapsIterable.drop(1);
+        }).drop(1);
   }
 
   private RubyArray<String> rowToRubyArray(final Row row) {

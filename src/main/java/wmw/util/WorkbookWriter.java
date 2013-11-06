@@ -20,10 +20,11 @@
  */
 package wmw.util;
 
+import static net.sf.rubycollect4j.RubyCollections.newRubyArray;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -47,6 +48,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * 
  */
 public final class WorkbookWriter {
+
+  private static final Logger logger = Logger.getLogger(WorkbookWriter.class
+      .getName());
 
   private final Workbook wb;
   private Sheet sheet;
@@ -140,7 +144,7 @@ public final class WorkbookWriter {
    * @return a String List
    */
   public List<String> getAllSheetNames() {
-    List<String> sheets = new ArrayList<String>();
+    List<String> sheets = newRubyArray();
     for (int i = 0; i < wb.getNumberOfSheets(); i++) {
       sheets.add(wb.getSheetName(i));
     }
@@ -259,7 +263,7 @@ public final class WorkbookWriter {
       wb.write(out);
       out.close();
     } catch (IOException e) {
-      Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
+      logger.log(Level.SEVERE, null, e);
       throw new RuntimeException(e);
     }
     return new File(path);
