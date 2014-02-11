@@ -427,13 +427,12 @@ public final class WorkbookReader {
         if (item == null)
           return "";
 
+        item.setCellType(Cell.CELL_TYPE_STRING);
         String val = item.toString();
         if (isCSV && val.contains(",")) {
           val = val.replaceAll("\"", "\"\"");
           return '"' + val + '"';
         }
-        if (val.matches("^\\d+\\.0"))
-          val = val.substring(0, val.lastIndexOf('.'));
         return val;
       }
 
