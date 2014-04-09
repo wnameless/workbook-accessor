@@ -416,7 +416,7 @@ public final class WorkbookReader {
     if (isClosed)
       throw new IllegalStateException("Workbook has been closed.");
     if (!hasHeader)
-      throw new IllegalStateException("Header not found!");
+      throw new IllegalStateException("Header is not found.");
 
     return newRubyLazyEnumerator(sheet).map(
         new TransformBlock<Row, Map<String, String>>() {

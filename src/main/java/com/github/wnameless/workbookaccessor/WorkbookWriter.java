@@ -171,7 +171,7 @@ public final class WorkbookWriter {
     if (sheetName == null)
       throw new NullPointerException("Sheet name can't be null.");
     if (getAllSheetNames().contains(sheetName))
-      throw new IllegalArgumentException("Sheet name is existed.");
+      throw new IllegalArgumentException("Sheet name is already existed.");
 
     wb.createSheet(sheetName);
     return this;
@@ -218,7 +218,7 @@ public final class WorkbookWriter {
     if (sheetName == null)
       throw new NullPointerException("Sheet name can't be null.");
     if (getAllSheetNames().contains(sheetName))
-      throw new IllegalArgumentException("Sheet name is existed.");
+      throw new IllegalArgumentException("Sheet name is already existed.");
 
     sheet = wb.createSheet(sheetName);
     return this;

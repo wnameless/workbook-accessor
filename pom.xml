@@ -13,8 +13,8 @@
 	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>nullproof</name>
-	<description>A Java Null-Proof Object Constructor</description>
+	<name>workbook-accessor</name>
+	<description>A friendly workbook writer and reader for Java based on Apache POI</description>
 	<url>https://github.com/wnameless/nullproof</url>
 
 	<licenses>
