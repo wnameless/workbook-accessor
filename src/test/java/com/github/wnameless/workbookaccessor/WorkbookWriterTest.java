@@ -96,6 +96,12 @@ public class WorkbookWriterTest {
     assertEquals("Sheet0", writer.getCurrentSheetName());
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSheetException() {
+    writer.createSheet("test");
+    writer.createSheet("test");
+  }
+
   @Test
   public void testTurnToSheet() {
     writer.createSheet("test");
@@ -105,10 +111,21 @@ public class WorkbookWriterTest {
     assertEquals("Sheet0", writer.getCurrentSheetName());
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testTurnToSheetException() {
+    writer.turnToSheet("hahaha");
+  }
+
   @Test
   public void testCreateAndTurnToSheet() {
     writer.createAndTurnToSheet("test");
     assertEquals("test", writer.getCurrentSheetName());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateAndTurnToSheetException() {
+    writer.createAndTurnToSheet("test");
+    writer.createAndTurnToSheet("test");
   }
 
   @Test

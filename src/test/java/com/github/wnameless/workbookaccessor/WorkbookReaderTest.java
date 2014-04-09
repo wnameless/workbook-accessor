@@ -153,6 +153,16 @@ public class WorkbookReaderTest {
     reader.turnToSheet(0, false);
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testTurnToSheetException4() throws IOException {
+    reader.turnToSheet("hahaha");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testTurnToSheetException5() throws IOException {
+    reader.turnToSheet("hahaha", true);
+  }
+
   @Test
   public void testToCSV() {
     assertTrue(reader.toCSV() instanceof Iterable);

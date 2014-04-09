@@ -170,6 +170,8 @@ public final class WorkbookWriter {
   public WorkbookWriter createSheet(String sheetName) {
     if (sheetName == null)
       throw new NullPointerException("Sheet name can't be null.");
+    if (getAllSheetNames().contains(sheetName))
+      throw new IllegalArgumentException("Sheet name is existed.");
 
     wb.createSheet(sheetName);
     return this;
@@ -195,11 +197,13 @@ public final class WorkbookWriter {
    *          of a sheet
    * @return this WorkbookWriter
    */
-  public WorkbookWriter turnToSheet(String name) {
-    if (name == null)
-      throw new NullPointerException("Name can't be null.");
+  public WorkbookWriter turnToSheet(String sheetName) {
+    if (sheetName == null)
+      throw new NullPointerException("Sheet name can't be null.");
+    if (!getAllSheetNames().contains(sheetName))
+      throw new IllegalArgumentException("Sheet name is not found.");
 
-    return turnToSheet(getAllSheetNames().indexOf(name));
+    return turnToSheet(getAllSheetNames().indexOf(sheetName));
   }
 
   /**
@@ -210,11 +214,13 @@ public final class WorkbookWriter {
    *          of a sheet
    * @return this WorkbookWriter
    */
-  public WorkbookWriter createAndTurnToSheet(String name) {
-    if (name == null)
-      throw new NullPointerException("Name can't be null.");
+  public WorkbookWriter createAndTurnToSheet(String sheetName) {
+    if (sheetName == null)
+      throw new NullPointerException("Sheet name can't be null.");
+    if (getAllSheetNames().contains(sheetName))
+      throw new IllegalArgumentException("Sheet name is existed.");
 
-    sheet = wb.createSheet(name);
+    sheet = wb.createSheet(sheetName);
     return this;
   }
 

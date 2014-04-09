@@ -290,11 +290,13 @@ public final class WorkbookReader {
    *          of a sheet
    * @return this WorkbookReader
    */
-  public WorkbookReader turnToSheet(String name) {
-    if (name == null)
-      throw new NullPointerException("Name can't be null.");
+  public WorkbookReader turnToSheet(String sheetName) {
+    if (sheetName == null)
+      throw new NullPointerException("Sheet name can't be null.");
+    if (!getAllSheetNames().contains(sheetName))
+      throw new IllegalArgumentException("Sheet name is not found.");
 
-    return turnToSheet(getAllSheetNames().indexOf(name));
+    return turnToSheet(getAllSheetNames().indexOf(sheetName));
   }
 
   /**
@@ -327,11 +329,13 @@ public final class WorkbookReader {
    *          true if spreadsheet gets a header, false otherwise
    * @return this WorkbookReader
    */
-  public WorkbookReader turnToSheet(String name, boolean hasHeader) {
-    if (name == null)
-      throw new NullPointerException("Name can't be null.");
+  public WorkbookReader turnToSheet(String sheetName, boolean hasHeader) {
+    if (sheetName == null)
+      throw new NullPointerException("Sheet name can't be null.");
+    if (!getAllSheetNames().contains(sheetName))
+      throw new IllegalArgumentException("Sheet name is not found.");
 
-    return turnToSheet(getAllSheetNames().indexOf(name), hasHeader);
+    return turnToSheet(getAllSheetNames().indexOf(sheetName), hasHeader);
   }
 
   /**
@@ -404,7 +408,7 @@ public final class WorkbookReader {
 
   /**
    * Converts the spreadsheet to Maps by a Map Iterable. All Maps are
-   * implemented by LinkedHashMap.
+   * implemented by LinkedHashMap which implies the order of all fields is kept.
    * 
    * @return a Map Iterable
    */
