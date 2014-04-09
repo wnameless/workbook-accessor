@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Workbook-accessor by wnameless</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Workbook-accessor</h1>
+        <p>A friendly spreadsheet reader and writer for Java based on Apache POI</p>
+
+        <p class="view"><a href="https://github.com/wnameless/workbook-accessor">View the Project on GitHub <small>wnameless/workbook-accessor</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/wnameless/workbook-accessor/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/wnameless/workbook-accessor/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/wnameless/workbook-accessor">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="workbook-accessor" class="anchor" href="#workbook-accessor"><span class="octicon octicon-link"></span></a>workbook-accessor</h1>
+
+<p>A friendly workbook writer and reader for Java based on Apache POI</p>
+
+<h2>
+<a name="purpose" class="anchor" href="#purpose"><span class="octicon octicon-link"></span></a>Purpose</h2>
+
+<p>Sometimes, you only need to do simple jobs with workbook files(Excel, Spreadsheet...).<br>
+The workbook-accessor provides you an easy and convenient way to manipulate workbooks in a breeze.</p>
+
+<h2>
+<a name="maven-repo" class="anchor" href="#maven-repo"><span class="octicon octicon-link"></span></a>Maven Repo</h2>
+
+<div class="highlight highlight-xml"><pre><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.github.wnameless<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>workbook-accessor<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.1.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+
+<h2>
+<a name="quick-start" class="anchor" href="#quick-start"><span class="octicon octicon-link"></span></a>Quick Start</h2>
+
+<h4>
+<a name="workbookreader" class="anchor" href="#workbookreader"><span class="octicon octicon-link"></span></a>WorkbookReader</h4>
+
+<div class="highlight highlight-java"><pre><span class="n">WorkbookReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WorkbookReader</span><span class="o">(</span><span class="s">"path_to_workbook"</span><span class="o">);</span>
+<span class="k">for</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">row</span> <span class="o">:</span> <span class="n">reader</span><span class="o">.</span><span class="na">toLists</span><span class="o">())</span> <span class="o">{</span>
+  <span class="c1">// Print all the rows in workbook</span>
+  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">row</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+
+<h4>
+<a name="workbookwriter" class="anchor" href="#workbookwriter"><span class="octicon octicon-link"></span></a>WorkbookWriter</h4>
+
+<div class="highlight highlight-java"><pre><span class="n">WorkbookWriter</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WorkbookWriter</span><span class="o">(</span><span class="s">"name_of_sheet"</span><span class="o">);</span>
+<span class="n">writer</span><span class="o">.</span><span class="na">addRow</span><span class="o">(</span><span class="mi">123</span><span class="o">,</span> <span class="s">"abc"</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">());</span>
+<span class="n">writer</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="s">"path_of_the_output_file"</span><span class="o">);</span>
+</pre></div>
+
+<h2>
+<a name="feature" class="anchor" href="#feature"><span class="octicon octicon-link"></span></a>Feature</h2>
+
+<p>Works on multiple sheets.</p>
+
+<div class="highlight highlight-java"><pre><span class="n">reader</span><span class="o">.</span><span class="na">turnToSheet</span><span class="o">(</span><span class="s">"Sheet0"</span><span class="o">);</span>
+<span class="n">writer</span><span class="o">.</span><span class="na">createAndTurnToSheet</span><span class="o">(</span><span class="s">"NewSheet"</span><span class="o">);</span>
+</pre></div>
+
+<p>More than one way to interate over the rows of a sheet.</p>
+
+<div class="highlight highlight-java"><pre><span class="n">reader</span><span class="o">.</span><span class="na">toCSV</span><span class="o">();</span>    <span class="c1">// Returns a Iterable&lt;String&gt;</span>
+<span class="n">reader</span><span class="o">.</span><span class="na">toLists</span><span class="o">();</span>  <span class="c1">// Returns a Iterable&lt;List&lt;String&gt;&gt;</span>
+<span class="n">reader</span><span class="o">.</span><span class="na">toArrays</span><span class="o">();</span> <span class="c1">// Returns a Iterable&lt;String[]&gt;</span>
+<span class="n">reader</span><span class="o">.</span><span class="na">toMaps</span><span class="o">();</span>   <span class="c1">// Returns a Iterable&lt;Map&lt;String, String&gt;&gt;</span>
+</pre></div>
+
+<p>More than one way to add a new row to a sheet.</p>
+
+<div class="highlight highlight-java"><pre>
+<span class="n">writer</span><span class="o">.</span><span class="na">addRow</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span> <span class="s">"b"</span><span class="o">,</span> <span class="s">"c"</span><span class="o">));</span> <span class="c1">// Accepts any Iterable</span>
+<span class="n">writer</span><span class="o">.</span><span class="na">addRow</span><span class="o">(</span><span class="mi">123</span><span class="o">,</span> <span class="s">"abc"</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">());</span>       <span class="c1">// Object VarArgs</span>
+</pre></div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/wnameless">wnameless</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
