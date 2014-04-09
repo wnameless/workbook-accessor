@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package wmw.util;
+package com.github.wnameless.workbookaccessor;
 
 import static net.sf.rubycollect4j.RubyCollections.ra;
 import static org.junit.Assert.assertEquals;
@@ -37,6 +37,9 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.github.wnameless.workbookaccessor.WorkbookReader;
+import com.github.wnameless.workbookaccessor.WorkbookWriter;
 
 public class WorkbookWriterTest {
 

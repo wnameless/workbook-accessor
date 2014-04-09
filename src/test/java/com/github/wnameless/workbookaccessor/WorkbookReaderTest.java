@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package wmw.util;
+package com.github.wnameless.workbookaccessor;
 
 import static net.sf.rubycollect4j.RubyCollections.Hash;
 import static net.sf.rubycollect4j.RubyCollections.ra;
@@ -35,6 +35,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.github.wnameless.workbookaccessor.WorkbookReader;
 
 public class WorkbookReaderTest {
 

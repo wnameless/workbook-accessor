@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package wmw.util;
+package com.github.wnameless.workbookaccessor;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -26,4 +26,4 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ WorkbookReaderTest.class, WorkbookWriterTest.class })
-public class WorkbookAccessorTests {}
+public class AllTests {}

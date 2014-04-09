@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package wmw.util;
+package com.github.wnameless.workbookaccessor;
 
 import static net.sf.rubycollect4j.RubyCollections.Hash;
 import static net.sf.rubycollect4j.RubyCollections.newRubyArray;

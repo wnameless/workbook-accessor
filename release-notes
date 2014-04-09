@@ -3,3 +3,7 @@ Version 1.0.0
 
 Version 1.0.1
 * Fixed the long numeric string reading issue of ExcelReader
+
+Version 1.1.0
+* Changed package names
+* Moved to Maven central repo
