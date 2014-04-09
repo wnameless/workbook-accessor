@@ -74,6 +74,9 @@ public final class WorkbookReader {
    *          of a Workbook
    */
   public WorkbookReader(String path) {
+    if (path == null)
+      throw new NullPointerException("Path can't be null.");
+
     File file = new File(path);
     setSourceFile(file);
     sheet = wb.getSheetAt(0);
@@ -89,6 +92,9 @@ public final class WorkbookReader {
    *          true if spreadsheet gets a header, false otherwise
    */
   public WorkbookReader(String path, boolean hasHeader) {
+    if (path == null)
+      throw new NullPointerException("Path can't be null.");
+
     File file = new File(path);
     setSourceFile(file);
     sheet = wb.getSheetAt(0);
@@ -104,6 +110,9 @@ public final class WorkbookReader {
    *          of a Workbook
    */
   public WorkbookReader(File file) {
+    if (file == null)
+      throw new NullPointerException("File can't be null.");
+
     setSourceFile(file);
     sheet = wb.getSheetAt(0);
     setHeader();
@@ -118,6 +127,9 @@ public final class WorkbookReader {
    *          true if spreadsheet gets a header, false otherwise
    */
   public WorkbookReader(File file, boolean hasHeader) {
+    if (file == null)
+      throw new NullPointerException("File can't be null.");
+
     setSourceFile(file);
     sheet = wb.getSheetAt(0);
     this.hasHeader = hasHeader;
@@ -132,6 +144,9 @@ public final class WorkbookReader {
    *          a Workbook
    */
   public WorkbookReader(Workbook wb) {
+    if (wb == null)
+      throw new NullPointerException("Workbook can't be null.");
+
     this.wb = wb;
     sheet = wb.getSheetAt(0);
     hasHeader = true;
@@ -147,6 +162,9 @@ public final class WorkbookReader {
    *          true if spreadsheet gets a header, false otherwise
    */
   public WorkbookReader(Workbook wb, boolean hasHeader) {
+    if (wb == null)
+      throw new NullPointerException("Workbook can't be null.");
+
     this.wb = wb;
     sheet = wb.getSheetAt(0);
     this.hasHeader = hasHeader;
@@ -273,6 +291,9 @@ public final class WorkbookReader {
    * @return this WorkbookReader
    */
   public WorkbookReader turnToSheet(String name) {
+    if (name == null)
+      throw new NullPointerException("Name can't be null.");
+
     return turnToSheet(getAllSheetNames().indexOf(name));
   }
 
@@ -307,6 +328,9 @@ public final class WorkbookReader {
    * @return this WorkbookReader
    */
   public WorkbookReader turnToSheet(String name, boolean hasHeader) {
+    if (name == null)
+      throw new NullPointerException("Name can't be null.");
+
     return turnToSheet(getAllSheetNames().indexOf(name), hasHeader);
   }
 

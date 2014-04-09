@@ -71,6 +71,9 @@ public final class WorkbookWriter {
    *          a Workbook
    */
   public WorkbookWriter(Workbook wb) {
+    if (wb == null)
+      throw new NullPointerException("Workbook can't be null.");
+
     this.wb = wb;
     if (wb.getNumberOfSheets() == 0)
       wb.createSheet();
@@ -84,6 +87,9 @@ public final class WorkbookWriter {
    *          name of the sheet
    */
   public WorkbookWriter(String sheetName) {
+    if (sheetName == null)
+      throw new NullPointerException("Sheet name can't be null.");
+
     wb = new HSSFWorkbook();
     sheet = wb.createSheet(sheetName);
   }
@@ -112,6 +118,9 @@ public final class WorkbookWriter {
    *          true if an xlsx file is used, otherwise false
    */
   public WorkbookWriter(String sheetName, boolean xlsx) {
+    if (sheetName == null)
+      throw new NullPointerException("Sheet name can't be null.");
+
     if (xlsx)
       wb = new HSSFWorkbook();
     else
@@ -159,6 +168,9 @@ public final class WorkbookWriter {
    * @return this WorkbookWriter
    */
   public WorkbookWriter createSheet(String sheetName) {
+    if (sheetName == null)
+      throw new NullPointerException("Sheet name can't be null.");
+
     wb.createSheet(sheetName);
     return this;
   }
@@ -184,6 +196,9 @@ public final class WorkbookWriter {
    * @return this WorkbookWriter
    */
   public WorkbookWriter turnToSheet(String name) {
+    if (name == null)
+      throw new NullPointerException("Name can't be null.");
+
     return turnToSheet(getAllSheetNames().indexOf(name));
   }
 
@@ -196,6 +211,9 @@ public final class WorkbookWriter {
    * @return this WorkbookWriter
    */
   public WorkbookWriter createAndTurnToSheet(String name) {
+    if (name == null)
+      throw new NullPointerException("Name can't be null.");
+
     sheet = wb.createSheet(name);
     return this;
   }
@@ -208,6 +226,9 @@ public final class WorkbookWriter {
    * @return this WorkbookWriter
    */
   public WorkbookWriter addRow(Iterable<? extends Object> fields) {
+    if (fields == null)
+      throw new NullPointerException("Fields can't be null.");
+
     Row row;
     if (sheet.getLastRowNum() == 0 && sheet.getPhysicalNumberOfRows() == 0)
       row = sheet.createRow(0);
@@ -247,6 +268,9 @@ public final class WorkbookWriter {
    * @return this WorkbookWriter
    */
   public WorkbookWriter addRow(Object... fields) {
+    if (fields == null)
+      throw new NullPointerException("Fields can't be null.");
+
     return addRow(Arrays.asList(fields));
   }
 
@@ -258,6 +282,9 @@ public final class WorkbookWriter {
    * @return a saved File
    */
   public File save(String path) {
+    if (path == null)
+      throw new NullPointerException("Path can't be null.");
+
     try {
       FileOutputStream out = new FileOutputStream(path);
       wb.write(out);

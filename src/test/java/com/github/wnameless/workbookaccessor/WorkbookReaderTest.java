@@ -36,7 +36,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.wnameless.workbookaccessor.WorkbookReader;
+import com.google.common.testing.NullPointerTester;
 
 public class WorkbookReaderTest {
 
@@ -61,6 +61,16 @@ public class WorkbookReaderTest {
     firstLineCSV =
         ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890", "黃", "小宜",
             "10", "19", "1979", "\"TEL0910,123,456\"", "", "李大華", "北榮");
+  }
+
+  @Test
+  public void testAllConstructorsNPE() {
+    new NullPointerTester().testAllPublicConstructors(WorkbookReader.class);
+  }
+
+  @Test
+  public void testAllPublicMethodsNPE() {
+    new NullPointerTester().testAllPublicInstanceMethods(reader);
   }
 
   @Test

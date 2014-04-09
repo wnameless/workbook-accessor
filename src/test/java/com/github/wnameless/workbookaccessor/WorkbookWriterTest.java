@@ -38,8 +38,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.wnameless.workbookaccessor.WorkbookReader;
-import com.github.wnameless.workbookaccessor.WorkbookWriter;
+import com.google.common.testing.NullPointerTester;
 
 public class WorkbookWriterTest {
 
@@ -49,6 +48,16 @@ public class WorkbookWriterTest {
   @Before
   public void setUp() throws Exception {
     writer = new WorkbookWriter();
+  }
+
+  @Test
+  public void testAllConstructorsNPE() {
+    new NullPointerTester().testAllPublicConstructors(WorkbookWriter.class);
+  }
+
+  @Test
+  public void testAllPublicMethodsNPE() {
+    new NullPointerTester().testAllPublicInstanceMethods(writer);
   }
 
   @Test
