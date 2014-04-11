@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import net.sf.rubycollect4j.RubyArray;
 import net.sf.rubycollect4j.RubyFile;
@@ -345,6 +346,7 @@ public class WorkbookReaderTest {
 
   @Test
   public void testToString() {
+    new WorkbookWriter().addRow(123, new Date()).save("aaa.xls");
     assertEquals(
         Objects.toStringHelper(WorkbookReader.class)
             .addValue(reader.toMultimap()).toString(), reader.toString());

@@ -22,6 +22,8 @@ package com.github.wnameless.workbookaccessor;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static net.sf.rubycollect4j.RubyCollections.newRubyArray;
+import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
+import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -239,7 +241,11 @@ public final class WorkbookWriter {
           cell.setCellValue((RichTextString) o);
         } else if (o instanceof Hyperlink) {
           cell.setHyperlink((Hyperlink) o);
+        } else if (o instanceof Number) {
+          cell.setCellType(CELL_TYPE_NUMERIC);
+          cell.setCellValue(((Number) o).doubleValue());
         } else {
+          cell.setCellType(CELL_TYPE_STRING);
           cell.setCellValue(o.toString());
         }
       }
