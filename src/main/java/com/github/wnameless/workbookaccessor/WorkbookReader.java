@@ -277,8 +277,6 @@ public final class WorkbookReader {
    * @return this WorkbookReader
    */
   public WorkbookReader turnToSheet(String sheetName) {
-    if (sheetName == null)
-      throw new NullPointerException("Sheet name can't be null.");
     if (!getAllSheetNames().contains(sheetName))
       throw new IllegalArgumentException("Sheet name is not found.");
 
@@ -316,8 +314,6 @@ public final class WorkbookReader {
    * @return this WorkbookReader
    */
   public WorkbookReader turnToSheet(String sheetName, boolean hasHeader) {
-    if (sheetName == null)
-      throw new NullPointerException("Sheet name can't be null.");
     if (!getAllSheetNames().contains(sheetName))
       throw new IllegalArgumentException("Sheet name is not found.");
 
