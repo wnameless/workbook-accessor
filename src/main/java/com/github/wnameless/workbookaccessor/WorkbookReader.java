@@ -152,8 +152,8 @@ public final class WorkbookReader {
    */
   public WorkbookReader(Workbook wb, boolean hasHeader) {
     this.wb = wb;
-    sheet = wb.getSheetAt(0);
     this.hasHeader = hasHeader;
+    sheet = wb.getSheetAt(0);
     setHeader();
   }
 
