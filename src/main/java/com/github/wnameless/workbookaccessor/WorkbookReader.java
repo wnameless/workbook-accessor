@@ -104,7 +104,7 @@ public final class WorkbookReader {
    * Creates a WorkbookReader by given File. Assumes there is a header within
    * the spreadsheet.
    * 
-   * @param path
+   * @param file
    *          of a Workbook
    */
   public WorkbookReader(File file) {
@@ -116,7 +116,7 @@ public final class WorkbookReader {
   /**
    * Creates a WorkbookReader by given File.
    * 
-   * @param path
+   * @param file
    *          of a Workbook
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
@@ -272,8 +272,8 @@ public final class WorkbookReader {
    * Turns this WorkbookReader to certain sheet. Sheets can be found by
    * getAllSheetNames().
    * 
-   * @param name
-   *          of a sheet
+   * @param sheetName
+   *          name of a sheet
    * @return this WorkbookReader
    */
   public WorkbookReader turnToSheet(String sheetName) {
@@ -307,8 +307,8 @@ public final class WorkbookReader {
    * Turns this WorkbookReader to certain sheet. Sheets can be found by
    * getSheets().
    * 
-   * @param name
-   *          of a sheet
+   * @param sheetName
+   *          name of a sheet
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
    * @return this WorkbookReader
