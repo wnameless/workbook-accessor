@@ -34,7 +34,9 @@ import net.sf.rubycollect4j.RubyArray;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.google.common.testing.NullPointerTester;
 
@@ -47,6 +49,9 @@ public class WorkbookReaderTest {
   private RubyArray<String> header;
   private RubyArray<String> firstLine;
   private RubyArray<String> firstLineCSV;
+
+  @Rule
+  public ExpectedException expectedEx = ExpectedException.none();
 
   @Before
   public void setUp() throws Exception {
@@ -61,6 +66,13 @@ public class WorkbookReaderTest {
     firstLineCSV =
         ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890", "黃", "小宜",
             "10", "19", "1979", "\"TEL0910,123,456\"", "", "李大華", "北榮");
+  }
+
+  @Test
+  public void testNullproof() {
+    expectedEx.expect(NullPointerException.class);
+    expectedEx.expectMessage("Parameter<String> is not nullable");
+    new WorkbookReader((String) null);
   }
 
   @Test
@@ -103,8 +115,10 @@ public class WorkbookReaderTest {
     assertEquals(ra(), readerNH.getHeader());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testGetHeaderException() throws IOException {
+    expectedEx.expect(IllegalStateException.class);
+    expectedEx.expectMessage("Workbook has been closed.");
     readerNH.close();
     readerNH.getHeader();
   }
@@ -119,8 +133,10 @@ public class WorkbookReaderTest {
     assertEquals(ra("PII_20130328154417"), reader.getAllSheetNames());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testGetSheetsException() throws IOException {
+    expectedEx.expect(IllegalStateException.class);
+    expectedEx.expectMessage("Workbook has been closed.");
     reader.close();
     reader.getAllSheetNames();
   }
@@ -141,25 +157,33 @@ public class WorkbookReaderTest {
     reader.turnToSheet(1);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testTurnToSheetException2() throws IOException {
+    expectedEx.expect(IllegalStateException.class);
+    expectedEx.expectMessage("Workbook has been closed.");
     reader.close();
     reader.turnToSheet(0);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testTurnToSheetException3() throws IOException {
+    expectedEx.expect(IllegalStateException.class);
+    expectedEx.expectMessage("Workbook has been closed.");
     reader.close();
     reader.turnToSheet(0, false);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testTurnToSheetException4() throws IOException {
+    expectedEx.expect(IllegalArgumentException.class);
+    expectedEx.expectMessage("Sheet name is not found.");
     reader.turnToSheet("hahaha");
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testTurnToSheetException5() throws IOException {
+    expectedEx.expect(IllegalArgumentException.class);
+    expectedEx.expectMessage("Sheet name is not found.");
     reader.turnToSheet("hahaha", true);
   }
 
@@ -189,8 +213,10 @@ public class WorkbookReaderTest {
     assertEquals(header, ra(readerNH.toLists()).first());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testToListsException() throws IOException {
+    expectedEx.expect(IllegalStateException.class);
+    expectedEx.expectMessage("Workbook has been closed.");
     reader.close();
     reader.toLists();
   }
@@ -205,8 +231,10 @@ public class WorkbookReaderTest {
     assertArrayEquals(header.toArray(), ra(readerNH.toArrays()).first());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testToArraysException() throws IOException {
+    expectedEx.expect(IllegalStateException.class);
+    expectedEx.expectMessage("Workbook has been closed.");
     reader.close();
     reader.toArrays();
   }
@@ -219,14 +247,18 @@ public class WorkbookReaderTest {
     assertEquals(Hash(header.zip(firstLine)), reader.toMaps().iterator().next());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testToMapsException1() {
+    expectedEx.expect(IllegalStateException.class);
+    expectedEx.expectMessage("Header is not found.");
     reader.turnToSheet(0, false);
     reader.toMaps();
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testToMapsException2() throws IOException {
+    expectedEx.expect(IllegalStateException.class);
+    expectedEx.expectMessage("Workbook has been closed.");
     reader.close();
     reader.toMaps();
   }

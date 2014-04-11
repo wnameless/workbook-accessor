@@ -36,7 +36,9 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.google.common.testing.NullPointerTester;
 
@@ -45,9 +47,19 @@ public class WorkbookWriterTest {
   private static final String BASE_DIR = "src/test/resources";
   private WorkbookWriter writer;
 
+  @Rule
+  public ExpectedException expectedEx = ExpectedException.none();
+
   @Before
   public void setUp() throws Exception {
     writer = new WorkbookWriter();
+  }
+
+  @Test
+  public void testNullproof() {
+    expectedEx.expect(NullPointerException.class);
+    expectedEx.expectMessage("Parameter<String> is not nullable");
+    new WorkbookWriter((String) null);
   }
 
   @Test
@@ -96,8 +108,10 @@ public class WorkbookWriterTest {
     assertEquals("Sheet0", writer.getCurrentSheetName());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCreateSheetException() {
+    expectedEx.expect(IllegalArgumentException.class);
+    expectedEx.expectMessage("Sheet name is already existed.");
     writer.createSheet("test");
     writer.createSheet("test");
   }
@@ -111,8 +125,10 @@ public class WorkbookWriterTest {
     assertEquals("Sheet0", writer.getCurrentSheetName());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testTurnToSheetException() {
+    expectedEx.expect(IllegalArgumentException.class);
+    expectedEx.expectMessage("Sheet name is not found.");
     writer.turnToSheet("hahaha");
   }
 
@@ -122,8 +138,10 @@ public class WorkbookWriterTest {
     assertEquals("test", writer.getCurrentSheetName());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCreateAndTurnToSheetException() {
+    expectedEx.expect(IllegalArgumentException.class);
+    expectedEx.expectMessage("Sheet name is already existed.");
     writer.createAndTurnToSheet("test");
     writer.createAndTurnToSheet("test");
   }
