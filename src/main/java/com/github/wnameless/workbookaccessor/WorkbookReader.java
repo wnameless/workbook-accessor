@@ -20,6 +20,8 @@
  */
 package com.github.wnameless.workbookaccessor;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static net.sf.rubycollect4j.RubyCollections.Hash;
 import static net.sf.rubycollect4j.RubyCollections.newRubyArray;
 import static net.sf.rubycollect4j.RubyCollections.newRubyLazyEnumerator;
@@ -49,6 +51,9 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import com.github.wnameless.nullproof.annotation.AcceptNull;
 import com.github.wnameless.nullproof.annotation.RejectNull;
+import com.google.common.base.Objects;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * 
@@ -94,7 +99,9 @@ public final class WorkbookReader {
    *          of a Workbook
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
+   * @deprecated use {@link #withoutHeader() } instead
    */
+  @Deprecated
   public WorkbookReader(String path, boolean hasHeader) {
     this.hasHeader = hasHeader;
     workbook = createWorkbook(new File(path));
@@ -122,7 +129,9 @@ public final class WorkbookReader {
    *          of a Workbook
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
+   * @deprecated use {@link #withoutHeader() } instead
    */
+  @Deprecated
   public WorkbookReader(File file, boolean hasHeader) {
     this.hasHeader = hasHeader;
     workbook = createWorkbook(file);
@@ -151,7 +160,9 @@ public final class WorkbookReader {
    *          a Workbook
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
+   * @deprecated use {@link #withoutHeader() } instead
    */
+  @Deprecated
   public WorkbookReader(Workbook workbook, boolean hasHeader) {
     this.workbook = workbook;
     this.hasHeader = hasHeader;
@@ -227,9 +238,7 @@ public final class WorkbookReader {
    * @return a String List
    */
   public List<String> getHeader() {
-    if (isClosed)
-      throw new IllegalStateException("Workbook has been closed.");
-
+    checkState(!isClosed, "Workbook has been closed.");
     return RubyArray.copyOf(header);
   }
 
@@ -267,9 +276,7 @@ public final class WorkbookReader {
    * @return this WorkbookReader
    */
   public WorkbookReader turnToSheet(int index) {
-    if (isClosed)
-      throw new IllegalStateException("Workbook has been closed.");
-
+    checkState(!isClosed, "Workbook has been closed.");
     sheet = workbook.getSheetAt(index);
     setHeader();
     return this;
@@ -284,9 +291,8 @@ public final class WorkbookReader {
    * @return this WorkbookReader
    */
   public WorkbookReader turnToSheet(String sheetName) {
-    if (!getAllSheetNames().contains(sheetName))
-      throw new IllegalArgumentException("Sheet name is not found.");
-
+    checkArgument(getAllSheetNames().contains(sheetName),
+        "Sheet name is not found.");
     return turnToSheet(getAllSheetNames().indexOf(sheetName));
   }
 
@@ -301,9 +307,7 @@ public final class WorkbookReader {
    * @return this WorkbookReader
    */
   public WorkbookReader turnToSheet(int index, boolean hasHeader) {
-    if (isClosed)
-      throw new IllegalStateException("Workbook has been closed.");
-
+    checkState(!isClosed, "Workbook has been closed.");
     this.hasHeader = hasHeader;
     sheet = workbook.getSheetAt(index);
     setHeader();
@@ -321,9 +325,8 @@ public final class WorkbookReader {
    * @return this WorkbookReader
    */
   public WorkbookReader turnToSheet(String sheetName, boolean hasHeader) {
-    if (!getAllSheetNames().contains(sheetName))
-      throw new IllegalArgumentException("Sheet name is not found.");
-
+    checkArgument(getAllSheetNames().contains(sheetName),
+        "Sheet name is not found.");
     return turnToSheet(getAllSheetNames().indexOf(sheetName), hasHeader);
   }
 
@@ -333,9 +336,7 @@ public final class WorkbookReader {
    * @return a String Iterable
    */
   public Iterable<String> toCSV() {
-    if (isClosed)
-      throw new IllegalStateException("Workbook has been closed.");
-
+    checkState(!isClosed, "Workbook has been closed.");
     RubyLazyEnumerator<String> CSVIterable =
         newRubyLazyEnumerator(sheet).map(new TransformBlock<Row, String>() {
 
@@ -355,9 +356,7 @@ public final class WorkbookReader {
    * @return a String List Iterable
    */
   public Iterable<List<String>> toLists() {
-    if (isClosed)
-      throw new IllegalStateException("Workbook has been closed.");
-
+    checkState(!isClosed, "Workbook has been closed.");
     RubyLazyEnumerator<List<String>> listsIterable =
         newRubyLazyEnumerator(sheet).map(
             new TransformBlock<Row, List<String>>() {
@@ -378,9 +377,7 @@ public final class WorkbookReader {
    * @return a String Array Iterable
    */
   public Iterable<String[]> toArrays() {
-    if (isClosed)
-      throw new IllegalStateException("Workbook has been closed.");
-
+    checkState(!isClosed, "Workbook has been closed.");
     RubyLazyEnumerator<String[]> arraysIterable =
         newRubyLazyEnumerator(sheet).map(new TransformBlock<Row, String[]>() {
 
@@ -402,11 +399,8 @@ public final class WorkbookReader {
    * @return a Map Iterable
    */
   public Iterable<Map<String, String>> toMaps() {
-    if (isClosed)
-      throw new IllegalStateException("Workbook has been closed.");
-    if (!hasHeader)
-      throw new IllegalStateException("Header is not found.");
-
+    checkState(!isClosed, "Workbook has been closed.");
+    checkState(hasHeader, "Header is not provided.");
     return newRubyLazyEnumerator(sheet).map(
         new TransformBlock<Row, Map<String, String>>() {
 
@@ -457,6 +451,54 @@ public final class WorkbookReader {
       }
 
     };
+  }
+
+  /**
+   * Converts this WorkbookReader to a WorkbookWriter.
+   * 
+   * @return a WorkbookWriter
+   */
+  public WorkbookWriter toWriter() {
+    return new WorkbookWriter(workbook);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof WorkbookReader) {
+      WorkbookReader reader = (WorkbookReader) o;
+      return Objects.equal(toMultimap(), reader.toMultimap());
+    }
+    return false;
+  }
+
+  public Multimap<String, List<String>> toMultimap() {
+    Multimap<String, List<String>> content = ArrayListMultimap.create();
+
+    String currentSheet = getCurrentSheetName();
+    boolean currentHeader = hasHeader;
+
+    for (String sheetName : getAllSheetNames()) {
+      turnToSheet(sheetName);
+      withoutHeader();
+      for (List<String> row : toLists()) {
+        content.put(sheetName, row);
+      }
+    }
+
+    turnToSheet(currentSheet);
+    hasHeader = currentHeader;
+
+    return content;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(toMultimap());
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(getClass()).addValue(toMultimap()).toString();
   }
 
 }

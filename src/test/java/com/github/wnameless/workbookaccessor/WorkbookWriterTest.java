@@ -22,6 +22,7 @@ package com.github.wnameless.workbookaccessor;
 
 import static net.sf.rubycollect4j.RubyCollections.ra;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -40,6 +41,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.google.common.base.Objects;
+import com.google.common.testing.EqualsTester;
 import com.google.common.testing.NullPointerTester;
 
 public class WorkbookWriterTest {
@@ -68,18 +71,16 @@ public class WorkbookWriterTest {
   }
 
   @Test
-  public void testAllPublicMethodsNPE() {
-    new NullPointerTester().testAllPublicInstanceMethods(writer);
+  public void testAllPublicMethodsNPE() throws Exception {
+    new NullPointerTester().ignore(
+        WorkbookWriter.class.getDeclaredMethod("equals", Object.class))
+        .testAllPublicInstanceMethods(writer);
   }
 
   @Test
   public void testConstructor() {
     assertTrue(writer instanceof WorkbookWriter);
     assertTrue(new WorkbookWriter("test") instanceof WorkbookWriter);
-    assertTrue(new WorkbookWriter(true) instanceof WorkbookWriter);
-    assertTrue(new WorkbookWriter(false) instanceof WorkbookWriter);
-    assertTrue(new WorkbookWriter("test", true) instanceof WorkbookWriter);
-    assertTrue(new WorkbookWriter("test", false) instanceof WorkbookWriter);
     assertTrue(new WorkbookWriter(new HSSFWorkbook()) instanceof WorkbookWriter);
     Workbook wb = new HSSFWorkbook();
     wb.createSheet();
@@ -180,6 +181,32 @@ public class WorkbookWriterTest {
     assertEquals("abc,def", reader.toCSV().iterator().next());
     reader.close();
     RubyFile.delete(RubyFile.join(BASE_DIR, "test.xls"));
+  }
+
+  @Test
+  public void testToReader() {
+    assertTrue(writer.toReader() instanceof WorkbookReader);
+  }
+
+  @Test
+  public void testEquality() {
+    new EqualsTester().addEqualityGroup(writer, new WorkbookWriter(),
+        new WorkbookWriter()).testEquals();
+  }
+
+  @Test
+  public void testUnequality() {
+    assertNotEquals(writer, new WorkbookWriter().addRow("123"));
+    assertNotEquals(writer.hashCode(), new WorkbookWriter().addRow("123")
+        .hashCode());
+  }
+
+  @Test
+  public void testToString() {
+    assertEquals(
+        Objects.toStringHelper(WorkbookWriter.class)
+            .addValue(writer.toReader().toMultimap()).toString(),
+        writer.toString());
   }
 
 }

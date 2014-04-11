@@ -24,12 +24,14 @@ import static net.sf.rubycollect4j.RubyCollections.Hash;
 import static net.sf.rubycollect4j.RubyCollections.ra;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 
 import net.sf.rubycollect4j.RubyArray;
+import net.sf.rubycollect4j.RubyFile;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -38,6 +40,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.google.common.base.Objects;
+import com.google.common.testing.EqualsTester;
 import com.google.common.testing.NullPointerTester;
 
 public class WorkbookReaderTest {
@@ -81,8 +85,10 @@ public class WorkbookReaderTest {
   }
 
   @Test
-  public void testAllPublicMethodsNPE() {
-    new NullPointerTester().testAllPublicInstanceMethods(reader);
+  public void testAllPublicMethodsNPE() throws Exception {
+    new NullPointerTester().ignore(
+        WorkbookReader.class.getDeclaredMethod("equals", Object.class))
+        .testAllPublicInstanceMethods(reader);
   }
 
   @Test
@@ -250,7 +256,7 @@ public class WorkbookReaderTest {
   @Test
   public void testToMapsException1() {
     expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Header is not found.");
+    expectedEx.expectMessage("Header is not provided.");
     reader.turnToSheet(0, false);
     reader.toMaps();
   }
@@ -304,6 +310,44 @@ public class WorkbookReaderTest {
     assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists()).at(1));
     assertEquals(ra("", "2", "", "4", "", "6", "", "8"), ra(reader.toLists())
         .at(2));
+  }
+
+  @Test
+  public void testSaveToDifferntFormat() {
+    new WorkbookWriter(
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx").getWorkbook())
+        .save(BASE_DIR + "jump_lines.xls");
+    assertEquals(
+        ra(new WorkbookReader(BASE_DIR + "jump_lines.xlsx").toLists()),
+        ra(new WorkbookReader(BASE_DIR + "jump_lines.xls").toLists()));
+    RubyFile.delete(BASE_DIR + "jump_lines.xls");
+  }
+
+  @Test
+  public void testToWriter() {
+    assertTrue(reader.toWriter() instanceof WorkbookWriter);
+  }
+
+  @Test
+  public void testEquality() {
+    new EqualsTester().addEqualityGroup(
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx")).testEquals();
+  }
+
+  @Test
+  public void testUnequality() {
+    assertNotEquals(reader, new WorkbookReader(BASE_DIR + "jump_lines.xlsx"));
+    assertNotEquals(reader.hashCode(), new WorkbookReader(BASE_DIR
+        + "jump_lines.xlsx").hashCode());
+  }
+
+  @Test
+  public void testToString() {
+    assertEquals(
+        Objects.toStringHelper(WorkbookReader.class)
+            .addValue(reader.toMultimap()).toString(), reader.toString());
   }
 
 }

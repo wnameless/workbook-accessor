@@ -12,3 +12,5 @@ Version 1.2.0
 + Using NullProof
 * Fixed potential bug while processing workbooks with jump lines
 + Added WorkbookWriter#setSheetName, WorkbookReader#withHeader & WorkbookReader#withoutHeader
+- Removed unnecessary WorkbookWriter constructors
++ Added WorkbookReader#toMultimap

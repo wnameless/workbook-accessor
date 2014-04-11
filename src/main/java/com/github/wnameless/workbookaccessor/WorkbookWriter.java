@@ -20,6 +20,7 @@
  */
 package com.github.wnameless.workbookaccessor;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static net.sf.rubycollect4j.RubyCollections.newRubyArray;
 
 import java.io.File;
@@ -42,6 +43,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.github.wnameless.nullproof.annotation.RejectNull;
+import com.google.common.base.Objects;
 
 /**
  * 
@@ -81,17 +83,6 @@ public final class WorkbookWriter {
   }
 
   /**
-   * Creates a WorkbookWriter and creates a new sheet by given name.
-   * 
-   * @param sheetName
-   *          name of the sheet
-   */
-  public WorkbookWriter(String sheetName) {
-    workbook = new HSSFWorkbook();
-    sheet = workbook.createSheet(sheetName);
-  }
-
-  /**
    * Creates a WorkbookWriter.
    * 
    * @param xlsx
@@ -111,15 +102,11 @@ public final class WorkbookWriter {
    * 
    * @param sheetName
    *          name of the sheet
-   * @param xlsx
-   *          true if a xlsx file is used, false otherwise
+   * @deprecated use {@link #setSheetName(String)} instead
    */
-  public WorkbookWriter(String sheetName, boolean xlsx) {
-    if (xlsx)
-      workbook = new HSSFWorkbook();
-    else
-      workbook = new XSSFWorkbook();
-
+  @Deprecated
+  public WorkbookWriter(String sheetName) {
+    workbook = new HSSFWorkbook();
     sheet = workbook.createSheet(sheetName);
   }
 
@@ -175,9 +162,8 @@ public final class WorkbookWriter {
    * @return this WorkbookWriter
    */
   public WorkbookWriter createSheet(String sheetName) {
-    if (getAllSheetNames().contains(sheetName))
-      throw new IllegalArgumentException("Sheet name is already existed.");
-
+    checkArgument(!getAllSheetNames().contains(sheetName),
+        "Sheet name is already existed.");
     workbook.createSheet(sheetName);
     return this;
   }
@@ -203,9 +189,8 @@ public final class WorkbookWriter {
    * @return this WorkbookWriter
    */
   public WorkbookWriter turnToSheet(String sheetName) {
-    if (!getAllSheetNames().contains(sheetName))
-      throw new IllegalArgumentException("Sheet name is not found.");
-
+    checkArgument(getAllSheetNames().contains(sheetName),
+        "Sheet name is not found.");
     return turnToSheet(getAllSheetNames().indexOf(sheetName));
   }
 
@@ -218,9 +203,8 @@ public final class WorkbookWriter {
    * @return this WorkbookWriter
    */
   public WorkbookWriter createAndTurnToSheet(String sheetName) {
-    if (getAllSheetNames().contains(sheetName))
-      throw new IllegalArgumentException("Sheet name is already existed.");
-
+    checkArgument(!getAllSheetNames().contains(sheetName),
+        "Sheet name is already existed.");
     sheet = workbook.createSheet(sheetName);
     return this;
   }
@@ -292,6 +276,36 @@ public final class WorkbookWriter {
       throw new RuntimeException(e);
     }
     return new File(path);
+  }
+
+  /**
+   * Converts this WorkbookWriter to a WorkbookReader.
+   * 
+   * @return a WorkbookReader
+   * @throws
+   */
+  public WorkbookReader toReader() {
+    return new WorkbookReader(workbook);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof WorkbookWriter) {
+      WorkbookWriter writer = (WorkbookWriter) o;
+      return Objects.equal(toReader(), writer.toReader());
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(toReader());
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(getClass()).addValue(toReader().toMultimap())
+        .toString();
   }
 
 }
