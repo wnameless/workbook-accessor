@@ -95,7 +95,7 @@ public final class WorkbookWriter {
    * Creates a WorkbookWriter.
    * 
    * @param xlsx
-   *          true if an xlsx file is used, otherwise false
+   *          true if a xlsx file is used, false otherwise
    */
   public WorkbookWriter(boolean xlsx) {
     if (xlsx)
@@ -112,7 +112,7 @@ public final class WorkbookWriter {
    * @param sheetName
    *          name of the sheet
    * @param xlsx
-   *          true if an xlsx file is used, otherwise false
+   *          true if a xlsx file is used, false otherwise
    */
   public WorkbookWriter(String sheetName, boolean xlsx) {
     if (xlsx)
@@ -170,8 +170,8 @@ public final class WorkbookWriter {
   }
 
   /**
-   * Turns this WorkbookWriter to certain sheet. Sheets can be found by
-   * getAllSheetNames().
+   * Turns this WorkbookWriter to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
    * @param index
    *          of a sheet
@@ -197,8 +197,8 @@ public final class WorkbookWriter {
   }
 
   /**
-   * Turns this WorkbookWriter to certain sheet. Sheets can be found by
-   * getAllSheetNames().
+   * Turns this WorkbookWriter to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
    * @param name
    *          of a sheet

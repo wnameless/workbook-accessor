@@ -233,8 +233,8 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this WorkbookReader to certain sheet. Sheets can be found by
-   * getAllSheetNames().
+   * Turns this WorkbookReader to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
    * @param index
    *          of a sheet
@@ -250,8 +250,8 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this WorkbookReader to certain sheet. Sheets can be found by
-   * getAllSheetNames().
+   * Turns this WorkbookReader to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
    * @param sheetName
    *          name of a sheet
@@ -265,8 +265,8 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this WorkbookReader to certain sheet. Sheets can be found by
-   * getAllSheetNames().
+   * Turns this WorkbookReader to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
    * @param index
    *          of a sheet
@@ -285,8 +285,8 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this WorkbookReader to certain sheet. Sheets can be found by
-   * getSheets().
+   * Turns this WorkbookReader to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
    * @param sheetName
    *          name of a sheet

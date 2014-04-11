@@ -28,8 +28,9 @@ for(List<String> row : reader.toLists()) {
 ####WorkbookWriter
 ```java
 WorkbookWriter writer = new WorkbookWriter("name_of_sheet");
-writer.addRow(123, "abc", new Date());
-writer.save("path_of_the_output_file");
+writer.addRow(123, "abc", new Date())
+      .addRow(1.1, 2.2f, 33L)
+      .save("path_of_the_output_file");
 ```
 
 ##Feature
