@@ -284,4 +284,26 @@ public class WorkbookReaderTest {
         .at(2));
   }
 
+  @Test
+  public void testWithHeader() {
+    reader =
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx", false).withHeader();
+    assertEquals(2, ra(reader.toLists()).size());
+    assertEquals(ra("a", "", "c", "", "e", "", "g"), reader.getHeader());
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists())
+        .first());
+    assertEquals(ra("", "2", "", "4", "", "6", ""), ra(reader.toLists()).last());
+  }
+
+  @Test
+  public void testWithoutHeader() {
+    reader = new WorkbookReader(BASE_DIR + "jump_lines.xlsx").withoutHeader();
+    assertEquals(3, ra(reader.toLists()).size());
+    assertEquals(ra(), reader.getHeader());
+    assertEquals(ra("a", "", "c", "", "e", "", "g"), ra(reader.toLists()).at(0));
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists()).at(1));
+    assertEquals(ra("", "2", "", "4", "", "6", "", "8"), ra(reader.toLists())
+        .at(2));
+  }
+
 }

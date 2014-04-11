@@ -124,6 +124,19 @@ public final class WorkbookWriter {
   }
 
   /**
+   * Sets current sheet name to given name.
+   * 
+   * @param sheetName
+   *          name of the sheet
+   * @return this WorkbookWriter
+   */
+  public WorkbookWriter setSheetName(String sheetName) {
+    workbook.setSheetName(workbook.getSheetIndex(sheet.getSheetName()),
+        sheetName);
+    return this;
+  }
+
+  /**
    * Returns the backing POI Workbook.
    * 
    * @return the POI Workbook

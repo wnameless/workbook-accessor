@@ -69,6 +69,10 @@ public final class WorkbookReader {
   private boolean isClosed = false;
   private FileInputStream fis;
 
+  public static WorkbookReader openFileWithHeader(String path) {
+    return new WorkbookReader(path);
+  }
+
   /**
    * Creates a WorkbookReader by given path. Assumes there is a header within
    * the spreadsheet.
@@ -166,17 +170,32 @@ public final class WorkbookReader {
   }
 
   /**
-   * Manually closes the Workbook file.
+   * Mentions this sheet is header included.
+   * 
+   * @return this WorkbookReader
    */
-  public void close() {
-    try {
-      if (fis != null)
-        fis.close();
-    } catch (IOException e) {
-      logger.log(Level.SEVERE, null, e);
-      throw new RuntimeException(e);
-    }
-    isClosed = true;
+  public WorkbookReader withHeader() {
+    hasHeader = true;
+    setHeader();
+    return this;
+  }
+
+  /**
+   * Mentions this sheet has no header.
+   * 
+   * @return this WorkbookReader
+   */
+  public WorkbookReader withoutHeader() {
+    hasHeader = false;
+    setHeader();
+    return this;
+  }
+
+  private void setHeader() {
+    header.clear();
+    Iterator<Row> rows = sheet.rowIterator();
+    if (rows.hasNext() && hasHeader)
+      header.addAll(rowToRubyArray(rows.next()));
   }
 
   /**
@@ -188,11 +207,18 @@ public final class WorkbookReader {
     return workbook;
   }
 
-  private void setHeader() {
-    header.clear();
-    Iterator<Row> rows = sheet.rowIterator();
-    if (rows.hasNext() && hasHeader)
-      header.addAll(rowToRubyArray(rows.next()));
+  /**
+   * Manually closes the Workbook file.
+   */
+  public void close() {
+    try {
+      if (fis != null)
+        fis.close();
+    } catch (IOException e) {
+      logger.log(Level.SEVERE, null, e);
+      throw new RuntimeException(e);
+    }
+    isClosed = true;
   }
 
   /**

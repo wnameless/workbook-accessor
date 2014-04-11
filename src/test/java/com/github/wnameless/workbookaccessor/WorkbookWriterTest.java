@@ -87,6 +87,13 @@ public class WorkbookWriterTest {
   }
 
   @Test
+  public void testSetSheetName() {
+    assertEquals(ra("Sheet0"), writer.getAllSheetNames());
+    assertEquals(ra("NewSheet"), writer.setSheetName("NewSheet")
+        .getAllSheetNames());
+  }
+
+  @Test
   public void testGetWorkbook() {
     assertTrue(writer.getWorkbook() instanceof Workbook);
   }
