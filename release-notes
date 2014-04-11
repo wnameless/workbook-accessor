@@ -7,3 +7,6 @@ Version 1.0.1
 Version 1.1.0
 * Changed package names
 * Moved to Maven central repo
+
+Version 1.1.1
++ Using NullProof

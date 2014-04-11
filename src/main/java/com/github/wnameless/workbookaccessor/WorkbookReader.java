@@ -47,12 +47,16 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import com.github.wnameless.nullproof.annotation.AcceptNull;
+import com.github.wnameless.nullproof.annotation.RejectNull;
+
 /**
  * 
  * WorkbookReader is a wrapper to Apache POI. It tends to provide friendly APIs
  * for workbook reading.
  * 
  */
+@RejectNull
 public final class WorkbookReader {
 
   private static final Logger logger = Logger.getLogger(WorkbookReader.class
@@ -74,9 +78,6 @@ public final class WorkbookReader {
    *          of a Workbook
    */
   public WorkbookReader(String path) {
-    if (path == null)
-      throw new NullPointerException("Path can't be null.");
-
     File file = new File(path);
     setSourceFile(file);
     sheet = wb.getSheetAt(0);
@@ -92,9 +93,6 @@ public final class WorkbookReader {
    *          true if spreadsheet gets a header, false otherwise
    */
   public WorkbookReader(String path, boolean hasHeader) {
-    if (path == null)
-      throw new NullPointerException("Path can't be null.");
-
     File file = new File(path);
     setSourceFile(file);
     sheet = wb.getSheetAt(0);
@@ -110,9 +108,6 @@ public final class WorkbookReader {
    *          of a Workbook
    */
   public WorkbookReader(File file) {
-    if (file == null)
-      throw new NullPointerException("File can't be null.");
-
     setSourceFile(file);
     sheet = wb.getSheetAt(0);
     setHeader();
@@ -127,9 +122,6 @@ public final class WorkbookReader {
    *          true if spreadsheet gets a header, false otherwise
    */
   public WorkbookReader(File file, boolean hasHeader) {
-    if (file == null)
-      throw new NullPointerException("File can't be null.");
-
     setSourceFile(file);
     sheet = wb.getSheetAt(0);
     this.hasHeader = hasHeader;
@@ -144,9 +136,6 @@ public final class WorkbookReader {
    *          a Workbook
    */
   public WorkbookReader(Workbook wb) {
-    if (wb == null)
-      throw new NullPointerException("Workbook can't be null.");
-
     this.wb = wb;
     sheet = wb.getSheetAt(0);
     hasHeader = true;
@@ -162,9 +151,6 @@ public final class WorkbookReader {
    *          true if spreadsheet gets a header, false otherwise
    */
   public WorkbookReader(Workbook wb, boolean hasHeader) {
-    if (wb == null)
-      throw new NullPointerException("Workbook can't be null.");
-
     this.wb = wb;
     sheet = wb.getSheetAt(0);
     this.hasHeader = hasHeader;
@@ -451,6 +437,7 @@ public final class WorkbookReader {
 
     return cells.map(new TransformBlock<Cell, String>() {
 
+      @AcceptNull
       public String yield(Cell item) {
         if (item == null)
           return "";
