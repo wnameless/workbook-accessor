@@ -55,7 +55,7 @@ public final class WorkbookWriter {
   private static final Logger logger = Logger.getLogger(WorkbookWriter.class
       .getName());
 
-  private final Workbook wb;
+  private final Workbook workbook;
   private Sheet sheet;
 
   /**
@@ -63,21 +63,21 @@ public final class WorkbookWriter {
    * used.
    */
   public WorkbookWriter() {
-    wb = new HSSFWorkbook();
-    sheet = wb.createSheet();
+    workbook = new HSSFWorkbook();
+    sheet = workbook.createSheet();
   }
 
   /**
    * Creates a WorkbookWriter by given Workbook.
    * 
-   * @param wb
+   * @param workbook
    *          a Workbook
    */
-  public WorkbookWriter(Workbook wb) {
-    this.wb = wb;
-    if (wb.getNumberOfSheets() == 0)
-      wb.createSheet();
-    sheet = wb.getSheetAt(0);
+  public WorkbookWriter(Workbook workbook) {
+    this.workbook = workbook;
+    if (workbook.getNumberOfSheets() == 0)
+      workbook.createSheet();
+    sheet = workbook.getSheetAt(0);
   }
 
   /**
@@ -87,8 +87,8 @@ public final class WorkbookWriter {
    *          name of the sheet
    */
   public WorkbookWriter(String sheetName) {
-    wb = new HSSFWorkbook();
-    sheet = wb.createSheet(sheetName);
+    workbook = new HSSFWorkbook();
+    sheet = workbook.createSheet(sheetName);
   }
 
   /**
@@ -99,11 +99,11 @@ public final class WorkbookWriter {
    */
   public WorkbookWriter(boolean xlsx) {
     if (xlsx)
-      wb = new HSSFWorkbook();
+      workbook = new HSSFWorkbook();
     else
-      wb = new XSSFWorkbook();
+      workbook = new XSSFWorkbook();
 
-    sheet = wb.createSheet();
+    sheet = workbook.createSheet();
   }
 
   /**
@@ -116,11 +116,11 @@ public final class WorkbookWriter {
    */
   public WorkbookWriter(String sheetName, boolean xlsx) {
     if (xlsx)
-      wb = new HSSFWorkbook();
+      workbook = new HSSFWorkbook();
     else
-      wb = new XSSFWorkbook();
+      workbook = new XSSFWorkbook();
 
-    sheet = wb.createSheet(sheetName);
+    sheet = workbook.createSheet(sheetName);
   }
 
   /**
@@ -129,7 +129,7 @@ public final class WorkbookWriter {
    * @return the POI Workbook
    */
   public Workbook getWorkbook() {
-    return wb;
+    return workbook;
   }
 
   /**
@@ -148,8 +148,8 @@ public final class WorkbookWriter {
    */
   public List<String> getAllSheetNames() {
     List<String> sheets = newRubyArray();
-    for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-      sheets.add(wb.getSheetName(i));
+    for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+      sheets.add(workbook.getSheetName(i));
     }
     return sheets;
   }
@@ -165,7 +165,7 @@ public final class WorkbookWriter {
     if (getAllSheetNames().contains(sheetName))
       throw new IllegalArgumentException("Sheet name is already existed.");
 
-    wb.createSheet(sheetName);
+    workbook.createSheet(sheetName);
     return this;
   }
 
@@ -178,7 +178,7 @@ public final class WorkbookWriter {
    * @return this WorkbookWriter
    */
   public WorkbookWriter turnToSheet(int index) {
-    sheet = wb.getSheetAt(index);
+    sheet = workbook.getSheetAt(index);
     return this;
   }
 
@@ -208,7 +208,7 @@ public final class WorkbookWriter {
     if (getAllSheetNames().contains(sheetName))
       throw new IllegalArgumentException("Sheet name is already existed.");
 
-    sheet = wb.createSheet(sheetName);
+    sheet = workbook.createSheet(sheetName);
     return this;
   }
 
@@ -272,7 +272,7 @@ public final class WorkbookWriter {
   public File save(String path) {
     try {
       FileOutputStream out = new FileOutputStream(path);
-      wb.write(out);
+      workbook.write(out);
       out.close();
     } catch (IOException e) {
       logger.log(Level.SEVERE, null, e);

@@ -25,8 +25,11 @@ import static net.sf.rubycollect4j.RubyCollections.newRubyArray;
 import static net.sf.rubycollect4j.RubyCollections.newRubyLazyEnumerator;
 import static net.sf.rubycollect4j.RubyCollections.ra;
 import static net.sf.rubycollect4j.RubyCollections.range;
+import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -38,9 +41,6 @@ import net.sf.rubycollect4j.RubyArray;
 import net.sf.rubycollect4j.RubyLazyEnumerator;
 import net.sf.rubycollect4j.block.TransformBlock;
 
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
-import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -62,13 +62,12 @@ public final class WorkbookReader {
   private static final Logger logger = Logger.getLogger(WorkbookReader.class
       .getName());
 
-  private NPOIFSFileSystem npoifs = null;
-  private OPCPackage pkg = null;
-  private Workbook wb;
+  private final Workbook workbook;
   private Sheet sheet;
-  private final RubyArray<String> header = newRubyArray();
+  private final List<String> header = newRubyArray();
   private boolean hasHeader = true;
   private boolean isClosed = false;
+  private FileInputStream fis;
 
   /**
    * Creates a WorkbookReader by given path. Assumes there is a header within
@@ -76,11 +75,11 @@ public final class WorkbookReader {
    * 
    * @param path
    *          of a Workbook
+   * @throws FileNotFoundException
    */
   public WorkbookReader(String path) {
-    File file = new File(path);
-    setSourceFile(file);
-    sheet = wb.getSheetAt(0);
+    workbook = createWorkbook(new File(path));
+    sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
@@ -93,10 +92,9 @@ public final class WorkbookReader {
    *          true if spreadsheet gets a header, false otherwise
    */
   public WorkbookReader(String path, boolean hasHeader) {
-    File file = new File(path);
-    setSourceFile(file);
-    sheet = wb.getSheetAt(0);
     this.hasHeader = hasHeader;
+    workbook = createWorkbook(new File(path));
+    sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
@@ -108,8 +106,8 @@ public final class WorkbookReader {
    *          of a Workbook
    */
   public WorkbookReader(File file) {
-    setSourceFile(file);
-    sheet = wb.getSheetAt(0);
+    workbook = createWorkbook(file);
+    sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
@@ -122,9 +120,9 @@ public final class WorkbookReader {
    *          true if spreadsheet gets a header, false otherwise
    */
   public WorkbookReader(File file, boolean hasHeader) {
-    setSourceFile(file);
-    sheet = wb.getSheetAt(0);
     this.hasHeader = hasHeader;
+    workbook = createWorkbook(file);
+    sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
@@ -132,12 +130,12 @@ public final class WorkbookReader {
    * Creates a WorkbookReader by given Workbook. Assumes there is a header
    * within the spreadsheet.
    * 
-   * @param wb
+   * @param workbook
    *          a Workbook
    */
-  public WorkbookReader(Workbook wb) {
-    this.wb = wb;
-    sheet = wb.getSheetAt(0);
+  public WorkbookReader(Workbook workbook) {
+    this.workbook = workbook;
+    sheet = workbook.getSheetAt(0);
     hasHeader = true;
     setHeader();
   }
@@ -145,31 +143,23 @@ public final class WorkbookReader {
   /**
    * Creates a WorkbookReader by given Workbook.
    * 
-   * @param wb
+   * @param workbook
    *          a Workbook
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
    */
-  public WorkbookReader(Workbook wb, boolean hasHeader) {
-    this.wb = wb;
+  public WorkbookReader(Workbook workbook, boolean hasHeader) {
+    this.workbook = workbook;
     this.hasHeader = hasHeader;
-    sheet = wb.getSheetAt(0);
+    sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
-  private void setSourceFile(File file) {
+  private Workbook createWorkbook(File file) {
     try {
-      npoifs = new NPOIFSFileSystem(file);
-      wb = WorkbookFactory.create(npoifs);
-    } catch (OfficeXmlFileException ofe) {
-      try {
-        pkg = OPCPackage.open(file);
-        wb = WorkbookFactory.create(pkg);
-      } catch (Exception e) {
-        logger.log(Level.SEVERE, null, e);
-        throw new RuntimeException(e);
-      }
-    } catch (IOException e) {
+      fis = new FileInputStream(file);
+      return WorkbookFactory.create(fis);
+    } catch (Exception e) {
       logger.log(Level.SEVERE, null, e);
       throw new RuntimeException(e);
     }
@@ -179,21 +169,12 @@ public final class WorkbookReader {
    * Manually closes the Workbook file.
    */
   public void close() {
-    if (npoifs != null) {
-      try {
-        npoifs.close();
-      } catch (IOException e) {
-        logger.log(Level.SEVERE, null, e);
-        throw new RuntimeException(e);
-      }
-    }
-    if (pkg != null) {
-      try {
-        pkg.close();
-      } catch (IOException e) {
-        logger.log(Level.SEVERE, null, e);
-        throw new RuntimeException(e);
-      }
+    try {
+      if (fis != null)
+        fis.close();
+    } catch (IOException e) {
+      logger.log(Level.SEVERE, null, e);
+      throw new RuntimeException(e);
     }
     isClosed = true;
   }
@@ -204,14 +185,14 @@ public final class WorkbookReader {
    * @return the POI Workbook
    */
   public Workbook getWorkbook() {
-    return wb;
+    return workbook;
   }
 
   private void setHeader() {
     header.clear();
     Iterator<Row> rows = sheet.rowIterator();
     if (rows.hasNext() && hasHeader)
-      header.concat(rowToRubyArray(rows.next()));
+      header.addAll(rowToRubyArray(rows.next()));
   }
 
   /**
@@ -223,7 +204,7 @@ public final class WorkbookReader {
     if (isClosed)
       throw new IllegalStateException("Workbook has been closed.");
 
-    return header.each().toA();
+    return RubyArray.copyOf(header);
   }
 
   /**
@@ -245,8 +226,8 @@ public final class WorkbookReader {
       throw new IllegalStateException("Workbook has been closed.");
 
     List<String> sheets = newRubyArray();
-    for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-      sheets.add(wb.getSheetName(i));
+    for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+      sheets.add(workbook.getSheetName(i));
     }
     return sheets;
   }
@@ -263,7 +244,7 @@ public final class WorkbookReader {
     if (isClosed)
       throw new IllegalStateException("Workbook has been closed.");
 
-    sheet = wb.getSheetAt(index);
+    sheet = workbook.getSheetAt(index);
     setHeader();
     return this;
   }
@@ -298,7 +279,7 @@ public final class WorkbookReader {
       throw new IllegalStateException("Workbook has been closed.");
 
     this.hasHeader = hasHeader;
-    sheet = wb.getSheetAt(index);
+    sheet = workbook.getSheetAt(index);
     setHeader();
     return this;
   }
@@ -416,29 +397,31 @@ public final class WorkbookReader {
     return rowToRubyArray(row, false);
   }
 
-  private RubyArray<String> rowToRubyArray(final Row row, final boolean isCSV) {
-    RubyArray<Cell> cells;
-    if (hasHeader) {
-      int colNum = ra(sheet.rowIterator().next()).count();
-      cells = range(0, colNum - 1).map(new TransformBlock<Integer, Cell>() {
+  private RubyArray<String> rowToRubyArray(final Row row, boolean isCSV) {
+    int colNum;
+    if (hasHeader)
+      colNum = sheet.rowIterator().next().getLastCellNum();
+    else
+      colNum = row.getLastCellNum();
 
-        public Cell yield(Integer item) {
-          return row.getCell(item);
-        }
+    return range(0, colNum - 1).map(new TransformBlock<Integer, Cell>() {
 
-      });
-    } else {
-      cells = ra(row.cellIterator());
-    }
+      public Cell yield(Integer item) {
+        return row.getCell(item);
+      }
 
-    return cells.map(new TransformBlock<Cell, String>() {
+    }).map(cell2Str(isCSV));
+  }
+
+  private TransformBlock<Cell, String> cell2Str(final boolean isCSV) {
+    return new TransformBlock<Cell, String>() {
 
       @AcceptNull
       public String yield(Cell item) {
         if (item == null)
           return "";
 
-        item.setCellType(Cell.CELL_TYPE_STRING);
+        item.setCellType(CELL_TYPE_STRING);
         String val = item.toString();
         if (isCSV && val.contains(",")) {
           val = val.replaceAll("\"", "\"\"");
@@ -447,7 +430,7 @@ public final class WorkbookReader {
         return val;
       }
 
-    });
+    };
   }
 
 }
