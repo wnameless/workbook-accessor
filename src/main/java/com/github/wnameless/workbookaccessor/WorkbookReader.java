@@ -442,7 +442,7 @@ public final class WorkbookReader {
         }).drop(1);
   }
 
-  private RubyArray<String> rowToRubyArray(final Row row) {
+  private RubyArray<String> rowToRubyArray(Row row) {
     return rowToRubyArray(row, false);
   }
 
