@@ -47,6 +47,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.testing.EqualsTester;
+import com.google.common.testing.NullPointerTester;
 
 public class WorkbookReaderTest {
 
@@ -80,26 +81,26 @@ public class WorkbookReaderTest {
 
   @Test
   public void testNullproof() {
-    // expectedEx.expect(NullPointerException.class);
-    // expectedEx.expectMessage("Parameter<String> is not nullable");
-    // new WorkbookReader((String) null);
+    expectedEx.expect(NullPointerException.class);
+    expectedEx.expectMessage("Parameter<String> is not nullable");
+    new WorkbookReader((String) null);
   }
 
   @Test
   public void testAllConstructorsNPE() {
-    // new NullPointerTester().testAllPublicConstructors(WorkbookReader.class);
+    new NullPointerTester().testAllPublicConstructors(WorkbookReader.class);
   }
 
   @Test
   public void testAllPublicMethodsNPE() throws Exception {
-    // new NullPointerTester().ignore(
-    // WorkbookReader.class.getDeclaredMethod("equals", Object.class))
-    // .testAllPublicInstanceMethods(reader);
+    new NullPointerTester().ignore(
+        WorkbookReader.class.getDeclaredMethod("equals", Object.class))
+        .testAllPublicInstanceMethods(reader);
   }
 
   @Test
   public void testAllPublicStaticMethodsNPE() {
-    // new NullPointerTester().testAllPublicStaticMethods(WorkbookReader.class);
+    new NullPointerTester().testAllPublicStaticMethods(WorkbookReader.class);
   }
 
   @SuppressWarnings("deprecation")

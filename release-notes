@@ -8,10 +8,11 @@ Version 1.1.0
 * Changed package names
 * Moved to Maven central repo
 
-Version 1.2.0
+Version 1.2.1
 + Using NullProof
 * Fixed potential bug while processing workbooks with jump lines
 + Added WorkbookWriter#setSheetName, WorkbookReader#withHeader & WorkbookReader#withoutHeader
 - Removed unnecessary WorkbookWriter constructors
 + Added WorkbookReader#toMultimap
 + Added static factory methods to WorkbookReadere and WorkbookWriter
+* Fixed the releasing process issue
