@@ -14,3 +14,4 @@ Version 1.2.0
 + Added WorkbookWriter#setSheetName, WorkbookReader#withHeader & WorkbookReader#withoutHeader
 - Removed unnecessary WorkbookWriter constructors
 + Added WorkbookReader#toMultimap
++ Added static factory methods to WorkbookReadere and WorkbookWriter

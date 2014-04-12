@@ -36,6 +36,7 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,8 +62,8 @@ public class WorkbookWriterTest {
   @Test
   public void testNullproof() {
     expectedEx.expect(NullPointerException.class);
-    expectedEx.expectMessage("Parameter<String> is not nullable");
-    new WorkbookWriter((String) null);
+    expectedEx.expectMessage("Parameter<Workbook> is not nullable");
+    WorkbookWriter.open(null);
   }
 
   @Test
@@ -78,13 +79,24 @@ public class WorkbookWriterTest {
   }
 
   @Test
+  public void testAllPublicStaticMethodsNPE() {
+    new NullPointerTester().testAllPublicStaticMethods(WorkbookWriter.class);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Test
   public void testConstructor() {
     assertTrue(writer instanceof WorkbookWriter);
     assertTrue(new WorkbookWriter("test") instanceof WorkbookWriter);
+    assertTrue(new WorkbookWriter(true) instanceof WorkbookWriter);
+    assertTrue(new WorkbookWriter(false) instanceof WorkbookWriter);
     assertTrue(new WorkbookWriter(new HSSFWorkbook()) instanceof WorkbookWriter);
     Workbook wb = new HSSFWorkbook();
     wb.createSheet();
     assertTrue(new WorkbookWriter(wb) instanceof WorkbookWriter);
+    assertTrue(WorkbookWriter.open(wb) instanceof WorkbookWriter);
+    assertTrue(WorkbookWriter.openXLSX() instanceof WorkbookWriter);
+    assertTrue(WorkbookWriter.openXLS() instanceof WorkbookWriter);
   }
 
   @Test
@@ -159,17 +171,17 @@ public class WorkbookWriterTest {
     Calendar cal = Calendar.getInstance();
     Date date = new Date();
     writer.addRow("def");
-    writer.addRow(
-        null,
-        true,
-        cal,
-        date,
-        1.1,
-        new HSSFRichTextString("Hello!"),
-        new HSSFWorkbook().getCreationHelper().createHyperlink(
-            Hyperlink.LINK_URL), "abc");
+    writer.addRow(null, true, cal, date, 1.1, new HSSFRichTextString("Hello!"),
+        new XSSFRichTextString("World."), new HSSFWorkbook()
+            .getCreationHelper().createHyperlink(Hyperlink.LINK_URL), 123,
+        "abc");
     assertEquals("def", writer.getWorkbook().getSheetAt(0).rowIterator().next()
         .cellIterator().next().getStringCellValue());
+    WorkbookWriter.openXLSX().addRow(new HSSFRichTextString("Hello!"),
+        new XSSFRichTextString("World."));
+    WorkbookWriter.openXLS().addRow(new HSSFRichTextString("Hello!"),
+        new XSSFRichTextString("World."));
+
   }
 
   @Test
@@ -177,7 +189,8 @@ public class WorkbookWriterTest {
     writer.addRow("abc", "def");
     writer.save(RubyFile.join(BASE_DIR, "test.xls"));
     WorkbookReader reader =
-        new WorkbookReader(RubyFile.join(BASE_DIR, "test.xls"), false);
+        WorkbookReader.open(RubyFile.join(BASE_DIR, "test.xls"))
+            .withoutHeader();
     assertEquals("abc,def", reader.toCSV().iterator().next());
     reader.close();
     RubyFile.delete(RubyFile.join(BASE_DIR, "test.xls"));

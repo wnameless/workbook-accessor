@@ -18,7 +18,7 @@ The workbook-accessor provides you an easy and convenient way to manipulate work
 ##Quick Start
 ####WorkbookReader
 ```java
-WorkbookReader reader = new WorkbookReader("path_to_workbook");
+WorkbookReader reader = WorkbookReader.open("path_to_workbook");
 for(List<String> row : reader.toLists()) {
   // Print all the rows in workbook
   System.out.println(row);
@@ -27,7 +27,7 @@ for(List<String> row : reader.toLists()) {
 
 ####WorkbookWriter
 ```java
-WorkbookWriter writer = new WorkbookWriter("name_of_sheet");
+WorkbookWriter writer = WorkbookWriter.openXLSX().setSheetName("name_of_the_sheet");
 writer.addRow(123, "abc", new Date())
       .addRow(1.1, 2.2f, 33L)
       .save("path_of_the_output_file");
@@ -53,4 +53,15 @@ More than one way to add a new row to a sheet.
 
 writer.addRow(Arrays.asList("a", "b", "c")); // Accepts any Iterable
 writer.addRow(123, "abc", new Date());       // Object VarArgs
+```
+
+Retrieve whole content at once.
+```java
+WorkbookReader.open("path_to_workbook").toMultimap(); // {Sheet1=>[[123, abc, !@#], [4, 5, 6], [d, e, f]], Sheet2=>[...], ...}
+```
+
+Interchangeable reader and writer
+```java
+reader.toWriter();
+writer.toReader();
 ```

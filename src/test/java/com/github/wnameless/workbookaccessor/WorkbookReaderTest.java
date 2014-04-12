@@ -22,6 +22,7 @@ package com.github.wnameless.workbookaccessor;
 
 import static net.sf.rubycollect4j.RubyCollections.Hash;
 import static net.sf.rubycollect4j.RubyCollections.ra;
+import static net.sf.rubycollect4j.RubyCollections.rs;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -30,18 +31,22 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import net.sf.rubycollect4j.RubyArray;
 import net.sf.rubycollect4j.RubyFile;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.NullPointerTester;
 
@@ -61,7 +66,9 @@ public class WorkbookReaderTest {
   @Before
   public void setUp() throws Exception {
     reader = new WorkbookReader(BASE_DIR + "PII_20130328154417.xls");
-    readerNH = new WorkbookReader(BASE_DIR + "PII_20130328154417.xls", false);
+    readerNH =
+        WorkbookReader.open(BASE_DIR + "PII_20130328154417.xls")
+            .withoutHeader();
     header =
         ra("編碼日期", "GUID", "MRN", "身份證字號", "姓氏", "名字", "出生月", "出生日", "出生年",
             "聯絡電話", "性別", "收案醫師", "收案醫院名稱");
@@ -93,6 +100,12 @@ public class WorkbookReaderTest {
   }
 
   @Test
+  public void testAllPublicStaticMethodsNPE() {
+    new NullPointerTester().testAllPublicStaticMethods(WorkbookReader.class);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Test
   public void testConstructor() {
     assertTrue(reader instanceof WorkbookReader);
     assertTrue(readerNH instanceof WorkbookReader);
@@ -104,6 +117,10 @@ public class WorkbookReaderTest {
     wb.createSheet();
     assertTrue(new WorkbookReader(wb) instanceof WorkbookReader);
     assertTrue(new WorkbookReader(wb, false) instanceof WorkbookReader);
+    assertTrue(WorkbookReader.open(wb) instanceof WorkbookReader);
+    assertTrue(WorkbookReader
+        .open(new File(BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
+    assertTrue(WorkbookReader.open(BASE_DIR + "PII_20130328154417.xls") instanceof WorkbookReader);
   }
 
   @Test(expected = RuntimeException.class)
@@ -157,6 +174,11 @@ public class WorkbookReaderTest {
     assertEquals(ra(), reader.turnToSheet(0, false).getHeader());
     assertEquals(ra(), reader.turnToSheet("PII_20130328154417", false)
         .getHeader());
+  }
+
+  @Test
+  public void testClose() {
+    WorkbookReader.open(new XSSFWorkbook()).close();
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -282,7 +304,7 @@ public class WorkbookReaderTest {
 
   @Test
   public void testJumpLinesWithoutHeader() {
-    reader = new WorkbookReader(BASE_DIR + "jump_lines.xlsx", false);
+    reader = WorkbookReader.open(BASE_DIR + "jump_lines.xlsx").withoutHeader();
     assertEquals(3, ra(reader.toLists()).size());
     assertEquals(ra(), reader.getHeader());
     assertEquals(ra("a", "", "c", "", "e", "", "g"), ra(reader.toLists()).at(0));
@@ -291,6 +313,7 @@ public class WorkbookReaderTest {
         .at(2));
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testWithHeader() {
     reader =
@@ -327,6 +350,16 @@ public class WorkbookReaderTest {
   @Test
   public void testToWriter() {
     assertTrue(reader.toWriter() instanceof WorkbookWriter);
+  }
+
+  @Test
+  public void testToMultimap() {
+    Multimap<String, List<String>> content = ArrayListMultimap.create();
+    content.put("工作表1", rs("a c e g").toA().mapǃ("trim"));
+    content.put("工作表1", rs("1 3 5 7").toA().mapǃ("trim"));
+    content.put("工作表1", rs(" 2 4 6 8").toA().mapǃ("trim"));
+    assertEquals(content,
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx").toMultimap());
   }
 
   @Test

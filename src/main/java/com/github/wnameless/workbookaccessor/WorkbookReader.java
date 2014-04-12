@@ -31,7 +31,6 @@ import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -57,8 +56,8 @@ import com.google.common.collect.Multimap;
 
 /**
  * 
- * WorkbookReader is a wrapper to Apache POI. It tends to provide friendly APIs
- * for workbook reading.
+ * {@link WorkbookReader} is a wrapper to Apache POI. It tends to provide
+ * friendly APIs for workbook reading.
  * 
  */
 @RejectNull
@@ -74,17 +73,45 @@ public final class WorkbookReader {
   private boolean isClosed = false;
   private FileInputStream fis;
 
-  public static WorkbookReader openFileWithHeader(String path) {
+  /**
+   * Returns a {@link WorkbookReader} by given path.
+   * 
+   * @param path
+   *          of a workbook
+   * @return a {@link WorkbookReader}
+   */
+  public static WorkbookReader open(String path) {
     return new WorkbookReader(path);
   }
 
   /**
-   * Creates a WorkbookReader by given path. Assumes there is a header within
-   * the spreadsheet.
+   * Returns a {@link WorkbookReader} by given file.
+   * 
+   * @param file
+   *          of a workbook
+   * @return a {@link WorkbookReader}
+   */
+  public static WorkbookReader open(File file) {
+    return new WorkbookReader(file);
+  }
+
+  /**
+   * Returns a {@link WorkbookReader} by given {@link Workbook}.
+   * 
+   * @param workbook
+   *          a {@link Workbook}
+   * @return a {@link WorkbookReader}
+   */
+  public static WorkbookReader open(Workbook workbook) {
+    return new WorkbookReader(workbook);
+  }
+
+  /**
+   * Creates a {@link WorkbookReader} by given path. Assumes there is a header
+   * included in the spreadsheet.
    * 
    * @param path
-   *          of a Workbook
-   * @throws FileNotFoundException
+   *          of a workbook
    */
   public WorkbookReader(String path) {
     workbook = createWorkbook(new File(path));
@@ -93,10 +120,10 @@ public final class WorkbookReader {
   }
 
   /**
-   * Creates a WorkbookReader by given path.
+   * Creates a {@link WorkbookReader} by given path.
    * 
    * @param path
-   *          of a Workbook
+   *          of a workbook
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
    * @deprecated use {@link #withoutHeader() } instead
@@ -110,11 +137,11 @@ public final class WorkbookReader {
   }
 
   /**
-   * Creates a WorkbookReader by given File. Assumes there is a header within
-   * the spreadsheet.
+   * Creates a {@link WorkbookReader} by given File. Assumes there is a header
+   * included in the spreadsheet.
    * 
    * @param file
-   *          of a Workbook
+   *          of a workbook
    */
   public WorkbookReader(File file) {
     workbook = createWorkbook(file);
@@ -123,10 +150,10 @@ public final class WorkbookReader {
   }
 
   /**
-   * Creates a WorkbookReader by given File.
+   * Creates a {@link WorkbookReader} by given File.
    * 
    * @param file
-   *          of a Workbook
+   *          of a workbook
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
    * @deprecated use {@link #withoutHeader() } instead
@@ -140,21 +167,23 @@ public final class WorkbookReader {
   }
 
   /**
-   * Creates a WorkbookReader by given Workbook. Assumes there is a header
-   * within the spreadsheet.
+   * Creates a {@link WorkbookReader} by given {@link Workbook}. Assumes there
+   * is a header included in the spreadsheet.
    * 
    * @param workbook
-   *          a Workbook
+   *          a {@link Workbook}
    */
   public WorkbookReader(Workbook workbook) {
     this.workbook = workbook;
+    if (workbook.getNumberOfSheets() == 0)
+      workbook.createSheet();
     sheet = workbook.getSheetAt(0);
     hasHeader = true;
     setHeader();
   }
 
   /**
-   * Creates a WorkbookReader by given Workbook.
+   * Creates a {@link WorkbookReader} by given Workbook.
    * 
    * @param workbook
    *          a Workbook
@@ -183,7 +212,7 @@ public final class WorkbookReader {
   /**
    * Mentions this sheet is header included.
    * 
-   * @return this WorkbookReader
+   * @return this {@link WorkbookReader}
    */
   public WorkbookReader withHeader() {
     hasHeader = true;
@@ -194,7 +223,7 @@ public final class WorkbookReader {
   /**
    * Mentions this sheet has no header.
    * 
-   * @return this WorkbookReader
+   * @return this {@link WorkbookReader}
    */
   public WorkbookReader withoutHeader() {
     hasHeader = false;
@@ -210,9 +239,9 @@ public final class WorkbookReader {
   }
 
   /**
-   * Returns the backing POI Workbook.
+   * Returns the backing POI {@link Workbook}.
    * 
-   * @return the POI Workbook
+   * @return the POI {@link Workbook}
    */
   public Workbook getWorkbook() {
     return workbook;
@@ -268,12 +297,12 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this WorkbookReader to certain sheet. Sheet names can be found by
-   * {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
+   * found by {@link #getAllSheetNames}.
    * 
    * @param index
    *          of a sheet
-   * @return this WorkbookReader
+   * @return this {@link WorkbookReader}
    */
   public WorkbookReader turnToSheet(int index) {
     checkState(!isClosed, "Workbook has been closed.");
@@ -283,12 +312,12 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this WorkbookReader to certain sheet. Sheet names can be found by
-   * {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
+   * found by {@link #getAllSheetNames}.
    * 
    * @param sheetName
    *          name of a sheet
-   * @return this WorkbookReader
+   * @return this {@link WorkbookReader}
    */
   public WorkbookReader turnToSheet(String sheetName) {
     checkArgument(getAllSheetNames().contains(sheetName),
@@ -297,14 +326,14 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this WorkbookReader to certain sheet. Sheet names can be found by
-   * {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
+   * found by {@link #getAllSheetNames}.
    * 
    * @param index
    *          of a sheet
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
-   * @return this WorkbookReader
+   * @return this {@link WorkbookReader}
    */
   public WorkbookReader turnToSheet(int index, boolean hasHeader) {
     checkState(!isClosed, "Workbook has been closed.");
@@ -315,14 +344,14 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this WorkbookReader to certain sheet. Sheet names can be found by
-   * {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
+   * found by {@link #getAllSheetNames}.
    * 
    * @param sheetName
    *          name of a sheet
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
-   * @return this WorkbookReader
+   * @return this {@link WorkbookReader}
    */
   public WorkbookReader turnToSheet(String sheetName, boolean hasHeader) {
     checkArgument(getAllSheetNames().contains(sheetName),
@@ -454,23 +483,21 @@ public final class WorkbookReader {
   }
 
   /**
-   * Converts this WorkbookReader to a WorkbookWriter.
+   * Converts this {@link WorkbookReader} to a {@link WorkbookWriter}.
    * 
-   * @return a WorkbookWriter
+   * @return a {@link WorkbookWriter}
    */
   public WorkbookWriter toWriter() {
     return new WorkbookWriter(workbook);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (o instanceof WorkbookReader) {
-      WorkbookReader reader = (WorkbookReader) o;
-      return Objects.equal(toMultimap(), reader.toMultimap());
-    }
-    return false;
-  }
-
+  /**
+   * Returns a {@link Multimap} which represents the content of this workbook.
+   * Each sheet name is used as the key, and the value is a Collection of String
+   * List which contains all fileds of a row.
+   * 
+   * @return a {@link Multimap}
+   */
   public Multimap<String, List<String>> toMultimap() {
     Multimap<String, List<String>> content = ArrayListMultimap.create();
 
@@ -489,6 +516,15 @@ public final class WorkbookReader {
     hasHeader = currentHeader;
 
     return content;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof WorkbookReader) {
+      WorkbookReader reader = (WorkbookReader) o;
+      return Objects.equal(toMultimap(), reader.toMultimap());
+    }
+    return false;
   }
 
   @Override
