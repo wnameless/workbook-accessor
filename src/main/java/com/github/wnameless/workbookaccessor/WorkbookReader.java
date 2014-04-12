@@ -186,7 +186,7 @@ public final class WorkbookReader {
    * Creates a {@link WorkbookReader} by given Workbook.
    * 
    * @param workbook
-   *          a Workbook
+   *          a {@link Workbook}
    * @param hasHeader
    *          true if spreadsheet gets a header, false otherwise
    * @deprecated use {@link #withoutHeader() } instead
@@ -210,7 +210,7 @@ public final class WorkbookReader {
   }
 
   /**
-   * Mentions this sheet is header included.
+   * Mentions there is a header in this sheet.
    * 
    * @return this {@link WorkbookReader}
    */
@@ -221,7 +221,7 @@ public final class WorkbookReader {
   }
 
   /**
-   * Mentions this sheet has no header.
+   * Mentions there is no header in this sheet.
    * 
    * @return this {@link WorkbookReader}
    */

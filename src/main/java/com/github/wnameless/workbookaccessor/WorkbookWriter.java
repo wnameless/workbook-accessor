@@ -135,7 +135,7 @@ public final class WorkbookWriter {
    * Creates a {@link WorkbookWriter} and creates a new sheet by given name.
    * 
    * @param sheetName
-   *          name of the sheet
+   *          name of a sheet
    * @deprecated use {@link #setSheetName(String)} instead
    */
   @Deprecated
@@ -148,7 +148,7 @@ public final class WorkbookWriter {
    * Sets current sheet name to given name.
    * 
    * @param sheetName
-   *          name of the sheet
+   *          name of a sheet
    * @return this {@link WorkbookWriter}
    */
   public WorkbookWriter setSheetName(String sheetName) {
@@ -169,7 +169,7 @@ public final class WorkbookWriter {
   /**
    * Returns the name of current sheet.
    * 
-   * @return the name of the sheet
+   * @return name of current sheet
    */
   public String getCurrentSheetName() {
     return sheet.getSheetName();
