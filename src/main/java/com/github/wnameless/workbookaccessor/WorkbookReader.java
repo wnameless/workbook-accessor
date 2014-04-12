@@ -466,6 +466,7 @@ public final class WorkbookReader {
     return new TransformBlock<Cell, String>() {
 
       @AcceptNull
+      @Override
       public String yield(Cell item) {
         if (item == null)
           return "";
