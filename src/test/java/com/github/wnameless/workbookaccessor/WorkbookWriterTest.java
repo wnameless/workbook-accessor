@@ -60,7 +60,7 @@ public class WorkbookWriterTest {
   }
 
   @Test
-  public void testNullproof() {
+  public void testNullProof() {
     expectedEx.expect(NullPointerException.class);
     expectedEx.expectMessage("Parameter<Workbook> is not nullable");
     WorkbookWriter.open(null);

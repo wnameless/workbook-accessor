@@ -455,6 +455,7 @@ public final class WorkbookReader {
 
     return range(0, colNum - 1).map(new TransformBlock<Integer, Cell>() {
 
+      @Override
       public Cell yield(Integer item) {
         return row.getCell(item);
       }

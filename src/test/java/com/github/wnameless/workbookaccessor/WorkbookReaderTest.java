@@ -80,7 +80,7 @@ public class WorkbookReaderTest {
   }
 
   @Test
-  public void testNullproof() {
+  public void testNullProof() {
     expectedEx.expect(NullPointerException.class);
     expectedEx.expectMessage("Parameter<String> is not nullable");
     new WorkbookReader((String) null);
