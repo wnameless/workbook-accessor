@@ -286,9 +286,7 @@ public final class WorkbookReader {
    * @return a String List
    */
   public List<String> getAllSheetNames() {
-    if (isClosed)
-      throw new IllegalStateException("Workbook has been closed.");
-
+    checkState(!isClosed, "Workbook has been closed.");
     List<String> sheets = newRubyArray();
     for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
       sheets.add(workbook.getSheetName(i));
@@ -375,7 +373,6 @@ public final class WorkbookReader {
           }
 
         });
-
     return hasHeader ? CSVIterable.drop(1) : CSVIterable;
   }
 
@@ -396,7 +393,6 @@ public final class WorkbookReader {
               }
 
             });
-
     return hasHeader ? listsIterable.drop(1) : listsIterable;
   }
 
@@ -417,7 +413,6 @@ public final class WorkbookReader {
           }
 
         });
-
     return hasHeader ? arraysIterable.drop(1) : arraysIterable;
   }
 
