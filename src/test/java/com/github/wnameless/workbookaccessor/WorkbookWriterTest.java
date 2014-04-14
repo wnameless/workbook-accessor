@@ -185,6 +185,13 @@ public class WorkbookWriterTest {
   }
 
   @Test
+  public void testAddRowWithLong() {
+    writer.addRow(214748364891234567L);
+    assertEquals("214748364891235000", writer.toReader().withoutHeader()
+        .toLists().iterator().next().get(0));
+  }
+
+  @Test
   public void testSave() throws InvalidFormatException, IOException {
     writer.addRow("abc", "def");
     writer.save(RubyFile.join(BASE_DIR, "test.xls"));
