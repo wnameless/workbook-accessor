@@ -123,11 +123,7 @@ public final class WorkbookWriter {
    */
   @Deprecated
   public WorkbookWriter(boolean xlsx) {
-    if (xlsx)
-      workbook = new HSSFWorkbook();
-    else
-      workbook = new XSSFWorkbook();
-
+    workbook = xlsx ? new HSSFWorkbook() : new XSSFWorkbook();
     sheet = workbook.createSheet();
   }
 
