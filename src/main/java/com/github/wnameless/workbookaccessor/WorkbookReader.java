@@ -491,7 +491,7 @@ public final class WorkbookReader {
   /**
    * Returns a {@link Multimap} which represents the content of this workbook.
    * Each sheet name is used as the key, and the value is a Collection of String
-   * List which contains all fileds of a row.
+   * List which contains all fields of a row.
    * 
    * @return a {@link Multimap}
    */
