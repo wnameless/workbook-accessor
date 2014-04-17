@@ -37,6 +37,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -97,6 +98,12 @@ public class WorkbookWriterTest {
     assertTrue(WorkbookWriter.open(wb) instanceof WorkbookWriter);
     assertTrue(WorkbookWriter.openXLSX() instanceof WorkbookWriter);
     assertTrue(WorkbookWriter.openXLS() instanceof WorkbookWriter);
+  }
+
+  @Test
+  public void testWorkbookFormat() {
+    assertTrue(WorkbookWriter.openXLSX().getWorkbook() instanceof XSSFWorkbook);
+    assertTrue(WorkbookWriter.openXLS().getWorkbook() instanceof HSSFWorkbook);
   }
 
   @Test
