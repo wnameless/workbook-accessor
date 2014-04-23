@@ -65,7 +65,7 @@ public final class WorkbookWriter {
   /**
    * Returns a {@link WorkbookWriter} with XLS format.
    * 
-   * @return a {@link WorkbookWriter}
+   * @return {@link WorkbookWriter}
    */
   public static WorkbookWriter openXLS() {
     return new WorkbookWriter();
@@ -74,7 +74,7 @@ public final class WorkbookWriter {
   /**
    * Returns a {@link WorkbookWriter} with XLSX format.
    * 
-   * @return a {@link WorkbookWriter}
+   * @return {@link WorkbookWriter}
    */
   public static WorkbookWriter openXLSX() {
     return new WorkbookWriter(true);
@@ -85,7 +85,7 @@ public final class WorkbookWriter {
    * 
    * @param workbook
    *          a {@link Workbook}
-   * @return a {@link WorkbookWriter}
+   * @return {@link WorkbookWriter}
    */
   public static WorkbookWriter open(Workbook workbook) {
     return new WorkbookWriter(workbook);
@@ -174,7 +174,7 @@ public final class WorkbookWriter {
   /**
    * Returns a List which contains all sheet names.
    * 
-   * @return a String List
+   * @return String List
    */
   public List<String> getAllSheetNames() {
     List<String> sheets = newRubyArray();
@@ -300,7 +300,7 @@ public final class WorkbookWriter {
    * 
    * @param path
    *          of the output file
-   * @return a saved File
+   * @return saved File
    */
   public File save(String path) {
     try {
@@ -317,7 +317,7 @@ public final class WorkbookWriter {
   /**
    * Converts this {@link WorkbookWriter} to a {@link WorkbookReader}.
    * 
-   * @return a {@link WorkbookReader}
+   * @return {@link WorkbookReader}
    */
   public WorkbookReader toReader() {
     return new WorkbookReader(workbook);

@@ -78,7 +78,7 @@ public final class WorkbookReader {
    * 
    * @param path
    *          of a workbook
-   * @return a {@link WorkbookReader}
+   * @return {@link WorkbookReader}
    */
   public static WorkbookReader open(String path) {
     return new WorkbookReader(path);
@@ -89,7 +89,7 @@ public final class WorkbookReader {
    * 
    * @param file
    *          of a workbook
-   * @return a {@link WorkbookReader}
+   * @return {@link WorkbookReader}
    */
   public static WorkbookReader open(File file) {
     return new WorkbookReader(file);
@@ -100,7 +100,7 @@ public final class WorkbookReader {
    * 
    * @param workbook
    *          a {@link Workbook}
-   * @return a {@link WorkbookReader}
+   * @return {@link WorkbookReader}
    */
   public static WorkbookReader open(Workbook workbook) {
     return new WorkbookReader(workbook);
@@ -264,7 +264,7 @@ public final class WorkbookReader {
   /**
    * Returns a List which contains all header fields.
    * 
-   * @return a String List
+   * @return String List
    */
   public List<String> getHeader() {
     checkState(!isClosed, "Workbook has been closed.");
@@ -283,7 +283,7 @@ public final class WorkbookReader {
   /**
    * Returns a List which contains all sheet names.
    * 
-   * @return a String List
+   * @return String List
    */
   public List<String> getAllSheetNames() {
     checkState(!isClosed, "Workbook has been closed.");
@@ -360,7 +360,7 @@ public final class WorkbookReader {
   /**
    * Converts the spreadsheet to CSV by a String Iterable.
    * 
-   * @return a String Iterable
+   * @return String Iterable
    */
   public Iterable<String> toCSV() {
     checkState(!isClosed, "Workbook has been closed.");
@@ -379,7 +379,7 @@ public final class WorkbookReader {
   /**
    * Converts the spreadsheet to String Lists by a List Iterable.
    * 
-   * @return a String List Iterable
+   * @return String List Iterable
    */
   public Iterable<List<String>> toLists() {
     checkState(!isClosed, "Workbook has been closed.");
@@ -399,7 +399,7 @@ public final class WorkbookReader {
   /**
    * Converts the spreadsheet to String Arrays by an Array Iterable.
    * 
-   * @return a String Array Iterable
+   * @return String Array Iterable
    */
   public Iterable<String[]> toArrays() {
     checkState(!isClosed, "Workbook has been closed.");
@@ -420,7 +420,7 @@ public final class WorkbookReader {
    * Converts the spreadsheet to Maps by a Map Iterable. All Maps are
    * implemented by LinkedHashMap which implies the order of all fields is kept.
    * 
-   * @return a Map Iterable
+   * @return Map Iterable
    */
   public Iterable<Map<String, String>> toMaps() {
     checkState(!isClosed, "Workbook has been closed.");
@@ -482,7 +482,7 @@ public final class WorkbookReader {
   /**
    * Converts this {@link WorkbookReader} to a {@link WorkbookWriter}.
    * 
-   * @return a {@link WorkbookWriter}
+   * @return {@link WorkbookWriter}
    */
   public WorkbookWriter toWriter() {
     return new WorkbookWriter(workbook);
@@ -493,7 +493,7 @@ public final class WorkbookReader {
    * Each sheet name is used as the key, and the value is a Collection of String
    * List which contains all fields of a row.
    * 
-   * @return a {@link Multimap}
+   * @return {@link Multimap}
    */
   public Multimap<String, List<String>> toMultimap() {
     Multimap<String, List<String>> content = ArrayListMultimap.create();
