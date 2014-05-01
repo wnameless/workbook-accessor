@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static net.sf.rubycollect4j.RubyCollections.Hash;
 import static net.sf.rubycollect4j.RubyCollections.newRubyArray;
-import static net.sf.rubycollect4j.RubyCollections.newRubyLazyEnumerator;
 import static net.sf.rubycollect4j.RubyCollections.ra;
 import static net.sf.rubycollect4j.RubyCollections.range;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
@@ -365,7 +364,7 @@ public final class WorkbookReader {
   public Iterable<String> toCSV() {
     checkState(!isClosed, "Workbook has been closed.");
     RubyLazyEnumerator<String> CSVIterable =
-        newRubyLazyEnumerator(sheet).map(new TransformBlock<Row, String>() {
+        RubyLazyEnumerator.of(sheet).map(new TransformBlock<Row, String>() {
 
           @Override
           public String yield(Row item) {
@@ -384,7 +383,7 @@ public final class WorkbookReader {
   public Iterable<List<String>> toLists() {
     checkState(!isClosed, "Workbook has been closed.");
     RubyLazyEnumerator<List<String>> listsIterable =
-        newRubyLazyEnumerator(sheet).map(
+        RubyLazyEnumerator.of(sheet).map(
             new TransformBlock<Row, List<String>>() {
 
               @Override
@@ -404,7 +403,7 @@ public final class WorkbookReader {
   public Iterable<String[]> toArrays() {
     checkState(!isClosed, "Workbook has been closed.");
     RubyLazyEnumerator<String[]> arraysIterable =
-        newRubyLazyEnumerator(sheet).map(new TransformBlock<Row, String[]>() {
+        RubyLazyEnumerator.of(sheet).map(new TransformBlock<Row, String[]>() {
 
           @Override
           public String[] yield(Row item) {
@@ -425,8 +424,8 @@ public final class WorkbookReader {
   public Iterable<Map<String, String>> toMaps() {
     checkState(!isClosed, "Workbook has been closed.");
     checkState(hasHeader, "Header is not provided.");
-    return newRubyLazyEnumerator(sheet).map(
-        new TransformBlock<Row, Map<String, String>>() {
+    return RubyLazyEnumerator.of(sheet)
+        .map(new TransformBlock<Row, Map<String, String>>() {
 
           @SuppressWarnings("unchecked")
           @Override
