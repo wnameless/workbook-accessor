@@ -43,7 +43,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.testing.EqualsTester;
@@ -372,7 +372,7 @@ public class WorkbookReaderTest {
   @Test
   public void testToString() {
     assertEquals(
-        Objects.toStringHelper(WorkbookReader.class)
+        MoreObjects.toStringHelper(WorkbookReader.class)
             .addValue(reader.toMultimap()).toString(), reader.toString());
   }
 

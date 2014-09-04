@@ -45,6 +45,7 @@ import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.github.wnameless.nullproof.annotation.RejectNull;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 /**
@@ -317,7 +318,7 @@ public final class WorkbookWriter {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).addValue(toReader().toMultimap())
+    return MoreObjects.toStringHelper(this).addValue(toReader().toMultimap())
         .toString();
   }
 

@@ -43,7 +43,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.NullPointerTester;
 
@@ -227,7 +227,7 @@ public class WorkbookWriterTest {
   @Test
   public void testToString() {
     assertEquals(
-        Objects.toStringHelper(WorkbookWriter.class)
+        MoreObjects.toStringHelper(WorkbookWriter.class)
             .addValue(writer.toReader().toMultimap()).toString(),
         writer.toString());
   }

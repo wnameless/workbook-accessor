@@ -49,6 +49,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import com.github.wnameless.nullproof.annotation.AcceptNull;
 import com.github.wnameless.nullproof.annotation.RejectNull;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -479,7 +480,7 @@ public final class WorkbookReader {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).addValue(toMultimap()).toString();
+    return MoreObjects.toStringHelper(this).addValue(toMultimap()).toString();
   }
 
 }
