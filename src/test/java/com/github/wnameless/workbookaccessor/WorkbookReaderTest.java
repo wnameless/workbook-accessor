@@ -103,19 +103,14 @@ public class WorkbookReaderTest {
     new NullPointerTester().testAllPublicStaticMethods(WorkbookReader.class);
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testConstructor() {
     assertTrue(reader instanceof WorkbookReader);
     assertTrue(readerNH instanceof WorkbookReader);
     assertTrue(new WorkbookReader(new File(BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
-    assertTrue(new WorkbookReader(
-        new File(BASE_DIR + "PII_20130328154417.xls"), false) instanceof WorkbookReader);
-    assertTrue(new WorkbookReader(BASE_DIR + "PII_20130328154417.xls", false) instanceof WorkbookReader);
     Workbook wb = new HSSFWorkbook();
     wb.createSheet();
     assertTrue(new WorkbookReader(wb) instanceof WorkbookReader);
-    assertTrue(new WorkbookReader(wb, false) instanceof WorkbookReader);
     assertTrue(WorkbookReader.open(wb) instanceof WorkbookReader);
     assertTrue(WorkbookReader
         .open(new File(BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
@@ -312,11 +307,9 @@ public class WorkbookReaderTest {
         .at(2));
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testWithHeader() {
-    reader =
-        new WorkbookReader(BASE_DIR + "jump_lines.xlsx", false).withHeader();
+    reader = new WorkbookReader(BASE_DIR + "jump_lines.xlsx").withHeader();
     assertEquals(2, ra(reader.toLists()).size());
     assertEquals(ra("a", "", "c", "", "e", "", "g"), reader.getHeader());
     assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists())

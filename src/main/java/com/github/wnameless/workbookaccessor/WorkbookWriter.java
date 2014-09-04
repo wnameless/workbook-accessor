@@ -113,31 +113,9 @@ public final class WorkbookWriter {
     sheet = workbook.getSheetAt(0);
   }
 
-  /**
-   * Creates a {@link WorkbookWriter}.
-   * 
-   * @param xlsx
-   *          true if a xlsx file is used, false otherwise
-   * @deprecated use {@link WorkbookWriter#openXLSX WorkbookWriter.openXLSX()}
-   *             instead
-   */
-  @Deprecated
-  public WorkbookWriter(boolean xlsx) {
+  private WorkbookWriter(boolean xlsx) {
     workbook = xlsx ? new XSSFWorkbook() : new HSSFWorkbook();
     sheet = workbook.createSheet();
-  }
-
-  /**
-   * Creates a {@link WorkbookWriter} and creates a new sheet by given name.
-   * 
-   * @param sheetName
-   *          name of a sheet
-   * @deprecated use {@link #setSheetName(String)} instead
-   */
-  @Deprecated
-  public WorkbookWriter(String sheetName) {
-    workbook = new HSSFWorkbook();
-    sheet = workbook.createSheet(sheetName);
   }
 
   /**
@@ -339,7 +317,7 @@ public final class WorkbookWriter {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(getClass()).addValue(toReader().toMultimap())
+    return Objects.toStringHelper(this).addValue(toReader().toMultimap())
         .toString();
   }
 

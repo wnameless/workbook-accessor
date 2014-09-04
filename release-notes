@@ -14,5 +14,10 @@ Version 1.2.1
 + Added WorkbookWriter#setSheetName, WorkbookReader#withHeader & WorkbookReader#withoutHeader
 - Removed unnecessary WorkbookWriter constructors
 + Added WorkbookReader#toMultimap
-+ Added static factory methods to WorkbookReadere and WorkbookWriter
++ Added static factory methods to WorkbookReader and WorkbookWriter
 * Fixed the releasing process issue
+
+Version 1.2.2
+- Removed deprecated methods
+* Updated dependencies
+- Removed the Guava dependency

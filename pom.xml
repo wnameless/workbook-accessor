@@ -139,22 +139,17 @@
 		<dependency>
 			<groupId>net.sf.rubycollect4j</groupId>
 			<artifactId>rubycollect4j</artifactId>
-			<version>1.8.0</version>
+			<version>1.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.10-FINAL</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>16.0.1</version>
+			<version>3.10.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava-testlib</artifactId>
-			<version>16.0.1</version>
+			<version>17.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

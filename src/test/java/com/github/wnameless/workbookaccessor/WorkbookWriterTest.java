@@ -84,13 +84,9 @@ public class WorkbookWriterTest {
     new NullPointerTester().testAllPublicStaticMethods(WorkbookWriter.class);
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testConstructor() {
     assertTrue(writer instanceof WorkbookWriter);
-    assertTrue(new WorkbookWriter("test") instanceof WorkbookWriter);
-    assertTrue(new WorkbookWriter(true) instanceof WorkbookWriter);
-    assertTrue(new WorkbookWriter(false) instanceof WorkbookWriter);
     assertTrue(new WorkbookWriter(new HSSFWorkbook()) instanceof WorkbookWriter);
     Workbook wb = new HSSFWorkbook();
     wb.createSheet();

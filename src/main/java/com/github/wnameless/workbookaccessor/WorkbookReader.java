@@ -66,8 +66,8 @@ public final class WorkbookReader {
       .getName());
 
   private final Workbook workbook;
-  private Sheet sheet;
   private final List<String> header = newRubyArray();
+  private Sheet sheet;
   private boolean hasHeader = true;
   private boolean isClosed = false;
   private FileInputStream fis;
@@ -119,23 +119,6 @@ public final class WorkbookReader {
   }
 
   /**
-   * Creates a {@link WorkbookReader} by given path.
-   * 
-   * @param path
-   *          of a workbook
-   * @param hasHeader
-   *          true if spreadsheet gets a header, false otherwise
-   * @deprecated use {@link #withoutHeader() } instead
-   */
-  @Deprecated
-  public WorkbookReader(String path, boolean hasHeader) {
-    this.hasHeader = hasHeader;
-    workbook = createWorkbook(new File(path));
-    sheet = workbook.getSheetAt(0);
-    setHeader();
-  }
-
-  /**
    * Creates a {@link WorkbookReader} by given File. Assumes there is a header
    * included in the spreadsheet.
    * 
@@ -143,23 +126,6 @@ public final class WorkbookReader {
    *          of a workbook
    */
   public WorkbookReader(File file) {
-    workbook = createWorkbook(file);
-    sheet = workbook.getSheetAt(0);
-    setHeader();
-  }
-
-  /**
-   * Creates a {@link WorkbookReader} by given File.
-   * 
-   * @param file
-   *          of a workbook
-   * @param hasHeader
-   *          true if spreadsheet gets a header, false otherwise
-   * @deprecated use {@link #withoutHeader() } instead
-   */
-  @Deprecated
-  public WorkbookReader(File file, boolean hasHeader) {
-    this.hasHeader = hasHeader;
     workbook = createWorkbook(file);
     sheet = workbook.getSheetAt(0);
     setHeader();
@@ -178,23 +144,6 @@ public final class WorkbookReader {
       workbook.createSheet();
     sheet = workbook.getSheetAt(0);
     hasHeader = true;
-    setHeader();
-  }
-
-  /**
-   * Creates a {@link WorkbookReader} by given Workbook.
-   * 
-   * @param workbook
-   *          a {@link Workbook}
-   * @param hasHeader
-   *          true if spreadsheet gets a header, false otherwise
-   * @deprecated use {@link #withoutHeader() } instead
-   */
-  @Deprecated
-  public WorkbookReader(Workbook workbook, boolean hasHeader) {
-    this.workbook = workbook;
-    this.hasHeader = hasHeader;
-    sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
@@ -530,7 +479,7 @@ public final class WorkbookReader {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(getClass()).addValue(toMultimap()).toString();
+    return Objects.toStringHelper(this).addValue(toMultimap()).toString();
   }
 
 }
