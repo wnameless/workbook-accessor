@@ -21,6 +21,7 @@
 package com.github.wnameless.workbookaccessor;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
@@ -125,13 +126,12 @@ public final class WorkbookWriter {
   /**
    * Sets current sheet name to given name.
    * 
-   * @param sheetName
-   *          name of a sheet
+   * @param name
+   *          of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter setSheetName(String sheetName) {
-    workbook.setSheetName(workbook.getSheetIndex(sheet.getSheetName()),
-        sheetName);
+  public WorkbookWriter setSheetName(String name) {
+    workbook.setSheetName(workbook.getSheetIndex(sheet.getSheetName()), name);
     return this;
   }
 
@@ -169,13 +169,13 @@ public final class WorkbookWriter {
   /**
    * Creates a new sheet.
    * 
-   * @param sheetName
-   *          name of a sheet
+   * @param name
+   *          of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter createSheet(String sheetName) {
-    checkArgument(!getAllSheetNames().contains(sheetName), SHEET_EXISTED);
-    workbook.createSheet(sheetName);
+  public WorkbookWriter createSheet(String name) {
+    checkArgument(!getAllSheetNames().contains(name), SHEET_EXISTED);
+    workbook.createSheet(name);
     return this;
   }
 
@@ -188,6 +188,7 @@ public final class WorkbookWriter {
    * @return this {@link WorkbookWriter}
    */
   public WorkbookWriter turnToSheet(int index) {
+    checkElementIndex(index, workbook.getNumberOfSheets());
     sheet = workbook.getSheetAt(index);
     return this;
   }
@@ -195,26 +196,26 @@ public final class WorkbookWriter {
   /**
    * Creates a new sheet and turns this {@link WorkbookWriter} to the sheet.
    * 
-   * @param sheetName
+   * @param name
    *          of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter turnToSheet(String sheetName) {
-    checkArgument(getAllSheetNames().contains(sheetName), SHEET_NOT_FOUND);
-    return turnToSheet(getAllSheetNames().indexOf(sheetName));
+  public WorkbookWriter turnToSheet(String name) {
+    checkArgument(getAllSheetNames().contains(name), SHEET_NOT_FOUND);
+    return turnToSheet(getAllSheetNames().indexOf(name));
   }
 
   /**
    * Turns this {@link WorkbookWriter} to certain sheet. Sheet names can be
    * found by {@link #getAllSheetNames}.
    * 
-   * @param sheetName
-   *          name of a sheet
+   * @param name
+   *          of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter createAndTurnToSheet(String sheetName) {
-    checkArgument(!getAllSheetNames().contains(sheetName), SHEET_EXISTED);
-    sheet = workbook.createSheet(sheetName);
+  public WorkbookWriter createAndTurnToSheet(String name) {
+    checkArgument(!getAllSheetNames().contains(name), SHEET_EXISTED);
+    sheet = workbook.createSheet(name);
     return this;
   }
 
@@ -267,7 +268,7 @@ public final class WorkbookWriter {
    * Adds a row to the sheet.
    * 
    * @param fields
-   *          an array of Object
+   *          a varargs of Object
    * @return this {@link WorkbookWriter}
    */
   public WorkbookWriter addRow(Object... fields) {

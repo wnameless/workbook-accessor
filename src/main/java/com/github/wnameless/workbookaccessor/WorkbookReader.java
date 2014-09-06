@@ -265,13 +265,13 @@ public final class WorkbookReader {
    * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
    * found by {@link #getAllSheetNames}.
    * 
-   * @param sheetName
-   *          name of a sheet
+   * @param name
+   *          of a sheet
    * @return this {@link WorkbookReader}
    */
-  public WorkbookReader turnToSheet(String sheetName) {
-    checkArgument(getAllSheetNames().contains(sheetName), SHEET_NOT_FOUND);
-    return turnToSheet(getAllSheetNames().indexOf(sheetName));
+  public WorkbookReader turnToSheet(String name) {
+    checkArgument(getAllSheetNames().contains(name), SHEET_NOT_FOUND);
+    return turnToSheet(getAllSheetNames().indexOf(name));
   }
 
   /**
@@ -286,8 +286,8 @@ public final class WorkbookReader {
    */
   public WorkbookReader turnToSheet(int index, boolean hasHeader) {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    this.hasHeader = hasHeader;
     sheet = workbook.getSheetAt(index);
+    this.hasHeader = hasHeader;
     setHeader();
     return this;
   }
@@ -296,15 +296,15 @@ public final class WorkbookReader {
    * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
    * found by {@link #getAllSheetNames}.
    * 
-   * @param sheetName
-   *          name of a sheet
+   * @param name
+   *          of a sheet
    * @param hasHeader
    *          true if spreadsheet has a header, false otherwise
    * @return this {@link WorkbookReader}
    */
-  public WorkbookReader turnToSheet(String sheetName, boolean hasHeader) {
-    checkArgument(getAllSheetNames().contains(sheetName), SHEET_NOT_FOUND);
-    return turnToSheet(getAllSheetNames().indexOf(sheetName), hasHeader);
+  public WorkbookReader turnToSheet(String name, boolean hasHeader) {
+    checkArgument(getAllSheetNames().contains(name), SHEET_NOT_FOUND);
+    return turnToSheet(getAllSheetNames().indexOf(name), hasHeader);
   }
 
   /**
@@ -329,7 +329,7 @@ public final class WorkbookReader {
   /**
    * Converts the spreadsheet to String Lists by a List Iterable.
    * 
-   * @return String List Iterable
+   * @return List of String Iterable
    */
   public Iterable<List<String>> toLists() {
     checkState(!isClosed, WORKBOOK_CLOSED);
@@ -349,7 +349,7 @@ public final class WorkbookReader {
   /**
    * Converts the spreadsheet to String Arrays by an Array Iterable.
    * 
-   * @return String Array Iterable
+   * @return String array Iterable
    */
   public Iterable<String[]> toArrays() {
     checkState(!isClosed, WORKBOOK_CLOSED);
@@ -370,7 +370,7 @@ public final class WorkbookReader {
    * Converts the spreadsheet to Maps by a Map Iterable. All Maps are
    * implemented by LinkedHashMap which implies the order of all fields is kept.
    * 
-   * @return Map Iterable
+   * @return Map{@literal <String, String>} Iterable
    */
   public Iterable<Map<String, String>> toMaps() {
     checkState(!isClosed, WORKBOOK_CLOSED);
@@ -443,7 +443,7 @@ public final class WorkbookReader {
    * workbook. Each sheet name is used as the key, and the value is a Collection
    * of String List which contains all fields of a row.
    * 
-   * @return {@link ListMultimap}
+   * @return {@link ListMultimap}{@literal <String, List<String>>}
    */
   public ListMultimap<String, List<String>> toMultimap() {
     ListMultimap<String, List<String>> content = ArrayListMultimap.create();
@@ -451,11 +451,11 @@ public final class WorkbookReader {
     String currentSheet = getCurrentSheetName();
     boolean currentHeader = hasHeader;
 
-    for (String sheetName : getAllSheetNames()) {
-      turnToSheet(sheetName);
+    for (String name : getAllSheetNames()) {
+      turnToSheet(name);
       withoutHeader();
       for (List<String> row : toLists()) {
-        content.put(sheetName, row);
+        content.put(name, row);
       }
     }
 

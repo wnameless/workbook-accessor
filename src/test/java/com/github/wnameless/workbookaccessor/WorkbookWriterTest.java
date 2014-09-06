@@ -149,10 +149,15 @@ public class WorkbookWriterTest {
   }
 
   @Test
-  public void testTurnToSheetException() {
+  public void testTurnToSheetException1() {
     expectedEx.expect(IllegalArgumentException.class);
     expectedEx.expectMessage("Sheet name is not found.");
     writer.turnToSheet("hahaha");
+  }
+
+  @Test(expected = IndexOutOfBoundsException.class)
+  public void testTurnToSheetException2() {
+    writer.turnToSheet(99);
   }
 
   @Test
