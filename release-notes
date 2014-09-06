@@ -21,3 +21,4 @@ Version 1.2.2
 - Removed deprecated methods
 * Updated dependencies
 - Removed the Guava dependency
+* Switched to SLF4J logger

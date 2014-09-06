@@ -30,8 +30,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -43,6 +41,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.wnameless.nullproof.annotation.RejectNull;
 import com.google.common.base.MoreObjects;
@@ -57,8 +57,11 @@ import com.google.common.base.Objects;
 @RejectNull
 public final class WorkbookWriter {
 
-  private static final Logger logger = Logger.getLogger(WorkbookWriter.class
-      .getName());
+  private static final Logger log = LoggerFactory
+      .getLogger(WorkbookWriter.class);
+
+  private static final String SHEET_EXISTED = "Sheet name is already existed.";
+  private static final String SHEET_NOT_FOUND = "Sheet name is not found.";
 
   private final Workbook workbook;
   private Sheet sheet;
@@ -171,8 +174,7 @@ public final class WorkbookWriter {
    * @return this {@link WorkbookWriter}
    */
   public WorkbookWriter createSheet(String sheetName) {
-    checkArgument(!getAllSheetNames().contains(sheetName),
-        "Sheet name is already existed.");
+    checkArgument(!getAllSheetNames().contains(sheetName), SHEET_EXISTED);
     workbook.createSheet(sheetName);
     return this;
   }
@@ -198,8 +200,7 @@ public final class WorkbookWriter {
    * @return this {@link WorkbookWriter}
    */
   public WorkbookWriter turnToSheet(String sheetName) {
-    checkArgument(getAllSheetNames().contains(sheetName),
-        "Sheet name is not found.");
+    checkArgument(getAllSheetNames().contains(sheetName), SHEET_NOT_FOUND);
     return turnToSheet(getAllSheetNames().indexOf(sheetName));
   }
 
@@ -212,8 +213,7 @@ public final class WorkbookWriter {
    * @return this {@link WorkbookWriter}
    */
   public WorkbookWriter createAndTurnToSheet(String sheetName) {
-    checkArgument(!getAllSheetNames().contains(sheetName),
-        "Sheet name is already existed.");
+    checkArgument(!getAllSheetNames().contains(sheetName), SHEET_EXISTED);
     sheet = workbook.createSheet(sheetName);
     return this;
   }
@@ -287,7 +287,7 @@ public final class WorkbookWriter {
       workbook.write(out);
       out.close();
     } catch (IOException e) {
-      logger.log(Level.SEVERE, null, e);
+      log.error(null, e);
       throw new RuntimeException(e);
     }
     return new File(path);
