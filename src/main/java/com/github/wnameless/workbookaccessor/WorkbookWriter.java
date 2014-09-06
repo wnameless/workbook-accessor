@@ -21,7 +21,7 @@
 package com.github.wnameless.workbookaccessor;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static net.sf.rubycollect4j.RubyCollections.newRubyArray;
+import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -159,7 +159,7 @@ public final class WorkbookWriter {
    * @return String List
    */
   public List<String> getAllSheetNames() {
-    List<String> sheets = newRubyArray();
+    List<String> sheets = newArrayList();
     for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
       sheets.add(workbook.getSheetName(i));
     }

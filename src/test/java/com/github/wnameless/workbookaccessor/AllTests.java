@@ -26,4 +26,4 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ WorkbookReaderTest.class, WorkbookWriterTest.class })
-public class WorkbookAccessorTests {}
+public class AllTests {}

@@ -22,8 +22,8 @@ package com.github.wnameless.workbookaccessor;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Lists.newArrayList;
 import static net.sf.rubycollect4j.RubyCollections.Hash;
-import static net.sf.rubycollect4j.RubyCollections.newRubyArray;
 import static net.sf.rubycollect4j.RubyCollections.ra;
 import static net.sf.rubycollect4j.RubyCollections.range;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
@@ -52,7 +52,7 @@ import com.github.wnameless.nullproof.annotation.RejectNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ListMultimap;
 
 /**
  * 
@@ -71,10 +71,10 @@ public final class WorkbookReader {
   private static final String NO_HEADER = "Header is not provided.";
 
   private final Workbook workbook;
-  private final List<String> header = newRubyArray();
+  private final List<String> header = newArrayList();
   private Sheet sheet;
-  private boolean headerInclude = true;
-  private boolean closed = false;
+  private boolean hasHeader = true;
+  private boolean isClosed = false;
   private FileInputStream fis;
 
   /**
@@ -148,7 +148,6 @@ public final class WorkbookReader {
     if (workbook.getNumberOfSheets() == 0)
       workbook.createSheet();
     sheet = workbook.getSheetAt(0);
-    headerInclude = true;
     setHeader();
   }
 
@@ -168,7 +167,7 @@ public final class WorkbookReader {
    * @return this {@link WorkbookReader}
    */
   public WorkbookReader withHeader() {
-    headerInclude = true;
+    hasHeader = true;
     setHeader();
     return this;
   }
@@ -179,7 +178,7 @@ public final class WorkbookReader {
    * @return this {@link WorkbookReader}
    */
   public WorkbookReader withoutHeader() {
-    headerInclude = false;
+    hasHeader = false;
     setHeader();
     return this;
   }
@@ -187,7 +186,7 @@ public final class WorkbookReader {
   private void setHeader() {
     header.clear();
     Iterator<Row> rows = sheet.rowIterator();
-    if (rows.hasNext() && headerInclude)
+    if (rows.hasNext() && hasHeader)
       header.addAll(rowToRubyArray(rows.next()));
   }
 
@@ -201,7 +200,7 @@ public final class WorkbookReader {
   }
 
   /**
-   * Manually closes the Workbook file.
+   * Closes the Workbook file manually.
    */
   public void close() {
     try {
@@ -211,7 +210,7 @@ public final class WorkbookReader {
       log.error(null, e);
       throw new RuntimeException(e);
     }
-    closed = true;
+    isClosed = true;
   }
 
   /**
@@ -220,7 +219,7 @@ public final class WorkbookReader {
    * @return String List
    */
   public List<String> getHeader() {
-    checkState(!closed, WORKBOOK_CLOSED);
+    checkState(!isClosed, WORKBOOK_CLOSED);
     return RubyArray.copyOf(header);
   }
 
@@ -239,8 +238,8 @@ public final class WorkbookReader {
    * @return String List
    */
   public List<String> getAllSheetNames() {
-    checkState(!closed, WORKBOOK_CLOSED);
-    List<String> sheets = newRubyArray();
+    checkState(!isClosed, WORKBOOK_CLOSED);
+    List<String> sheets = newArrayList();
     for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
       sheets.add(workbook.getSheetName(i));
     }
@@ -256,7 +255,7 @@ public final class WorkbookReader {
    * @return this {@link WorkbookReader}
    */
   public WorkbookReader turnToSheet(int index) {
-    checkState(!closed, WORKBOOK_CLOSED);
+    checkState(!isClosed, WORKBOOK_CLOSED);
     sheet = workbook.getSheetAt(index);
     setHeader();
     return this;
@@ -281,13 +280,13 @@ public final class WorkbookReader {
    * 
    * @param index
    *          of a sheet
-   * @param headerInclude
+   * @param hasHeader
    *          true if spreadsheet has a header, false otherwise
    * @return this {@link WorkbookReader}
    */
-  public WorkbookReader turnToSheet(int index, boolean headerInclude) {
-    checkState(!closed, WORKBOOK_CLOSED);
-    this.headerInclude = headerInclude;
+  public WorkbookReader turnToSheet(int index, boolean hasHeader) {
+    checkState(!isClosed, WORKBOOK_CLOSED);
+    this.hasHeader = hasHeader;
     sheet = workbook.getSheetAt(index);
     setHeader();
     return this;
@@ -299,13 +298,13 @@ public final class WorkbookReader {
    * 
    * @param sheetName
    *          name of a sheet
-   * @param headerInclude
+   * @param hasHeader
    *          true if spreadsheet has a header, false otherwise
    * @return this {@link WorkbookReader}
    */
-  public WorkbookReader turnToSheet(String sheetName, boolean headerInclude) {
+  public WorkbookReader turnToSheet(String sheetName, boolean hasHeader) {
     checkArgument(getAllSheetNames().contains(sheetName), SHEET_NOT_FOUND);
-    return turnToSheet(getAllSheetNames().indexOf(sheetName), headerInclude);
+    return turnToSheet(getAllSheetNames().indexOf(sheetName), hasHeader);
   }
 
   /**
@@ -314,7 +313,7 @@ public final class WorkbookReader {
    * @return String Iterable
    */
   public Iterable<String> toCSV() {
-    checkState(!closed, WORKBOOK_CLOSED);
+    checkState(!isClosed, WORKBOOK_CLOSED);
     RubyLazyEnumerator<String> CSVIterable =
         RubyLazyEnumerator.of(sheet).map(new TransformBlock<Row, String>() {
 
@@ -324,7 +323,7 @@ public final class WorkbookReader {
           }
 
         });
-    return headerInclude ? CSVIterable.drop(1) : CSVIterable;
+    return hasHeader ? CSVIterable.drop(1) : CSVIterable;
   }
 
   /**
@@ -333,7 +332,7 @@ public final class WorkbookReader {
    * @return String List Iterable
    */
   public Iterable<List<String>> toLists() {
-    checkState(!closed, WORKBOOK_CLOSED);
+    checkState(!isClosed, WORKBOOK_CLOSED);
     RubyLazyEnumerator<List<String>> listsIterable =
         RubyLazyEnumerator.of(sheet).map(
             new TransformBlock<Row, List<String>>() {
@@ -344,7 +343,7 @@ public final class WorkbookReader {
               }
 
             });
-    return headerInclude ? listsIterable.drop(1) : listsIterable;
+    return hasHeader ? listsIterable.drop(1) : listsIterable;
   }
 
   /**
@@ -353,7 +352,7 @@ public final class WorkbookReader {
    * @return String Array Iterable
    */
   public Iterable<String[]> toArrays() {
-    checkState(!closed, WORKBOOK_CLOSED);
+    checkState(!isClosed, WORKBOOK_CLOSED);
     RubyLazyEnumerator<String[]> arraysIterable =
         RubyLazyEnumerator.of(sheet).map(new TransformBlock<Row, String[]>() {
 
@@ -364,7 +363,7 @@ public final class WorkbookReader {
           }
 
         });
-    return headerInclude ? arraysIterable.drop(1) : arraysIterable;
+    return hasHeader ? arraysIterable.drop(1) : arraysIterable;
   }
 
   /**
@@ -374,8 +373,8 @@ public final class WorkbookReader {
    * @return Map Iterable
    */
   public Iterable<Map<String, String>> toMaps() {
-    checkState(!closed, WORKBOOK_CLOSED);
-    checkState(headerInclude, NO_HEADER);
+    checkState(!isClosed, WORKBOOK_CLOSED);
+    checkState(hasHeader, NO_HEADER);
     return RubyLazyEnumerator.of(sheet)
         .map(new TransformBlock<Row, Map<String, String>>() {
 
@@ -394,7 +393,7 @@ public final class WorkbookReader {
 
   private RubyArray<String> rowToRubyArray(final Row row, boolean isCSV) {
     int colNum;
-    if (headerInclude)
+    if (hasHeader)
       colNum = sheet.rowIterator().next().getLastCellNum();
     else
       colNum = row.getLastCellNum();
@@ -440,17 +439,17 @@ public final class WorkbookReader {
   }
 
   /**
-   * Returns a {@link Multimap} which represents the content of this workbook.
-   * Each sheet name is used as the key, and the value is a Collection of String
-   * List which contains all fields of a row.
+   * Returns a {@link ListMultimap} which represents the content of this
+   * workbook. Each sheet name is used as the key, and the value is a Collection
+   * of String List which contains all fields of a row.
    * 
-   * @return {@link Multimap}
+   * @return {@link ListMultimap}
    */
-  public Multimap<String, List<String>> toMultimap() {
-    Multimap<String, List<String>> content = ArrayListMultimap.create();
+  public ListMultimap<String, List<String>> toMultimap() {
+    ListMultimap<String, List<String>> content = ArrayListMultimap.create();
 
     String currentSheet = getCurrentSheetName();
-    boolean currentHeader = headerInclude;
+    boolean currentHeader = hasHeader;
 
     for (String sheetName : getAllSheetNames()) {
       turnToSheet(sheetName);
@@ -461,7 +460,7 @@ public final class WorkbookReader {
     }
 
     turnToSheet(currentSheet);
-    headerInclude = currentHeader;
+    hasHeader = currentHeader;
 
     return content;
   }
