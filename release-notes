@@ -22,3 +22,6 @@ Version 1.2.2
 * Updated dependencies
 - Removed the Guava dependency
 * Switched to SLF4J logger
+
+Version 1.2.3
++ Support using InputStream to create a WorkbookReader

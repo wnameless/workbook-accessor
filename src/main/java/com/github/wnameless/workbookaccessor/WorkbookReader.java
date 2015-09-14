@@ -31,13 +31,10 @@ import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.rubycollect4j.RubyArray;
-import net.sf.rubycollect4j.RubyLazyEnumerator;
-import net.sf.rubycollect4j.block.TransformBlock;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -54,6 +51,10 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
+import net.sf.rubycollect4j.RubyArray;
+import net.sf.rubycollect4j.RubyLazyEnumerator;
+import net.sf.rubycollect4j.block.TransformBlock;
+
 /**
  * 
  * {@link WorkbookReader} is a wrapper to Apache POI. It tends to provide
@@ -63,22 +64,22 @@ import com.google.common.collect.ListMultimap;
 @RejectNull
 public final class WorkbookReader {
 
-  private static final Logger log = LoggerFactory
-      .getLogger(WorkbookReader.class);
+  private static final Logger log =
+      LoggerFactory.getLogger(WorkbookReader.class);
 
-  private static final String WORKBOOK_CLOSED = "Workbook has been closed.";
-  private static final String SHEET_NOT_FOUND = "Sheet name is not found.";
-  private static final String NO_HEADER = "Header is not provided.";
+  private static final String WORKBOOK_CLOSED = "Workbook has been closed";
+  private static final String SHEET_NOT_FOUND = "Sheet name is not found";
+  private static final String NO_HEADER = "Header is not provided";
 
   private final Workbook workbook;
   private final List<String> header = newArrayList();
   private Sheet sheet;
   private boolean hasHeader = true;
   private boolean isClosed = false;
-  private FileInputStream fis;
+  private InputStream is;
 
   /**
-   * Returns a {@link WorkbookReader} by given path.
+   * Creates a {@link WorkbookReader} by given path.
    * 
    * @param path
    *          of a workbook
@@ -89,7 +90,7 @@ public final class WorkbookReader {
   }
 
   /**
-   * Returns a {@link WorkbookReader} by given file.
+   * Creates a {@link WorkbookReader} by given file.
    * 
    * @param file
    *          of a workbook
@@ -100,7 +101,7 @@ public final class WorkbookReader {
   }
 
   /**
-   * Returns a {@link WorkbookReader} by given {@link Workbook}.
+   * Creates a {@link WorkbookReader} by given {@link Workbook}.
    * 
    * @param workbook
    *          a {@link Workbook}
@@ -108,6 +109,17 @@ public final class WorkbookReader {
    */
   public static WorkbookReader open(Workbook workbook) {
     return new WorkbookReader(workbook);
+  }
+
+  /**
+   * Creates a {@link WorkbookReader} by given {@link InputStream}.
+   * 
+   * @param inputStream
+   *          an {@link InputStream}
+   * @return {@link WorkbookReader}
+   */
+  public static WorkbookReader open(InputStream inputStream) {
+    return new WorkbookReader(inputStream);
   }
 
   /**
@@ -145,16 +157,39 @@ public final class WorkbookReader {
    */
   public WorkbookReader(Workbook workbook) {
     this.workbook = workbook;
-    if (workbook.getNumberOfSheets() == 0)
-      workbook.createSheet();
+    if (workbook.getNumberOfSheets() == 0) workbook.createSheet();
+    sheet = workbook.getSheetAt(0);
+    setHeader();
+  }
+
+  /**
+   * Creates a {@link WorkbookReader} by given {@link InputStream}. Assumes
+   * there is a header included in the spreadsheet.
+   * 
+   * @param inputStream
+   *          an {@link InputStream}
+   */
+  public WorkbookReader(InputStream inputStream) {
+    this.workbook = createWorkbook(inputStream);
+    if (workbook.getNumberOfSheets() == 0) workbook.createSheet();
     sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
   private Workbook createWorkbook(File file) {
     try {
-      fis = new FileInputStream(file);
-      return WorkbookFactory.create(fis);
+      is = new FileInputStream(file);
+      return WorkbookFactory.create(is);
+    } catch (Exception e) {
+      log.error(null, e);
+      throw new RuntimeException(e);
+    }
+  }
+
+  private Workbook createWorkbook(InputStream ins) {
+    try {
+      is = ins;
+      return WorkbookFactory.create(is);
     } catch (Exception e) {
       log.error(null, e);
       throw new RuntimeException(e);
@@ -186,8 +221,7 @@ public final class WorkbookReader {
   private void setHeader() {
     header.clear();
     Iterator<Row> rows = sheet.rowIterator();
-    if (rows.hasNext() && hasHeader)
-      header.addAll(rowToRubyArray(rows.next()));
+    if (rows.hasNext() && hasHeader) header.addAll(rowToRubyArray(rows.next()));
   }
 
   /**
@@ -200,12 +234,11 @@ public final class WorkbookReader {
   }
 
   /**
-   * Closes the Workbook file manually.
+   * Closes the Workbook manually.
    */
   public void close() {
     try {
-      if (fis != null)
-        fis.close();
+      if (is != null) is.close();
     } catch (IOException e) {
       log.error(null, e);
       throw new RuntimeException(e);
@@ -333,16 +366,15 @@ public final class WorkbookReader {
    */
   public Iterable<List<String>> toLists() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    RubyLazyEnumerator<List<String>> listsIterable =
-        RubyLazyEnumerator.of(sheet).map(
-            new TransformBlock<Row, List<String>>() {
+    RubyLazyEnumerator<List<String>> listsIterable = RubyLazyEnumerator
+        .of(sheet).map(new TransformBlock<Row, List<String>>() {
 
-              @Override
-              public List<String> yield(Row item) {
-                return rowToRubyArray(item);
-              }
+          @Override
+          public List<String> yield(Row item) {
+            return rowToRubyArray(item);
+          }
 
-            });
+        });
     return hasHeader ? listsIterable.drop(1) : listsIterable;
   }
 
@@ -414,8 +446,7 @@ public final class WorkbookReader {
       @AcceptNull
       @Override
       public String yield(Cell item) {
-        if (item == null)
-          return "";
+        if (item == null) return "";
 
         item.setCellType(CELL_TYPE_STRING);
         String val = item.toString();
