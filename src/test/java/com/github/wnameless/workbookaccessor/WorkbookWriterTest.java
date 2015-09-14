@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
-import net.sf.rubycollect4j.RubyFile;
-
 import org.apache.poi.common.usermodel.Hyperlink;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -46,6 +44,8 @@ import org.junit.rules.ExpectedException;
 import com.google.common.base.MoreObjects;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.NullPointerTester;
+
+import net.sf.rubycollect4j.RubyFile;
 
 public class WorkbookWriterTest {
 
@@ -74,8 +74,8 @@ public class WorkbookWriterTest {
 
   @Test
   public void testAllPublicMethodsNPE() throws Exception {
-    new NullPointerTester().ignore(
-        WorkbookWriter.class.getDeclaredMethod("equals", Object.class))
+    new NullPointerTester()
+        .ignore(WorkbookWriter.class.getDeclaredMethod("equals", Object.class))
         .testAllPublicInstanceMethods(writer);
   }
 
@@ -87,7 +87,8 @@ public class WorkbookWriterTest {
   @Test
   public void testConstructor() {
     assertTrue(writer instanceof WorkbookWriter);
-    assertTrue(new WorkbookWriter(new HSSFWorkbook()) instanceof WorkbookWriter);
+    assertTrue(
+        new WorkbookWriter(new HSSFWorkbook()) instanceof WorkbookWriter);
     Workbook wb = new HSSFWorkbook();
     wb.createSheet();
     assertTrue(new WorkbookWriter(wb) instanceof WorkbookWriter);
@@ -105,8 +106,8 @@ public class WorkbookWriterTest {
   @Test
   public void testSetSheetName() {
     assertEquals(ra("Sheet0"), writer.getAllSheetNames());
-    assertEquals(ra("NewSheet"), writer.setSheetName("NewSheet")
-        .getAllSheetNames());
+    assertEquals(ra("NewSheet"),
+        writer.setSheetName("NewSheet").getAllSheetNames());
   }
 
   @Test
@@ -134,7 +135,7 @@ public class WorkbookWriterTest {
   @Test
   public void testCreateSheetException() {
     expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage("Sheet name is already existed.");
+    expectedEx.expectMessage("Sheet name is already existed");
     writer.createSheet("test");
     writer.createSheet("test");
   }
@@ -151,7 +152,7 @@ public class WorkbookWriterTest {
   @Test
   public void testTurnToSheetException1() {
     expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage("Sheet name is not found.");
+    expectedEx.expectMessage("Sheet name is not found");
     writer.turnToSheet("hahaha");
   }
 
@@ -169,7 +170,7 @@ public class WorkbookWriterTest {
   @Test
   public void testCreateAndTurnToSheetException() {
     expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage("Sheet name is already existed.");
+    expectedEx.expectMessage("Sheet name is already existed");
     writer.createAndTurnToSheet("test");
     writer.createAndTurnToSheet("test");
   }
@@ -179,10 +180,11 @@ public class WorkbookWriterTest {
     Calendar cal = Calendar.getInstance();
     Date date = new Date();
     writer.addRow("def");
-    writer.addRow(null, true, cal, date, 1.1, new HSSFRichTextString("Hello!"),
-        new XSSFRichTextString("World."), new HSSFWorkbook()
-            .getCreationHelper().createHyperlink(Hyperlink.LINK_URL), 123,
-        "abc");
+    writer
+        .addRow(null, true, cal, date, 1.1, new HSSFRichTextString("Hello!"),
+            new XSSFRichTextString("World."), new HSSFWorkbook()
+                .getCreationHelper().createHyperlink(Hyperlink.LINK_URL),
+            123, "abc");
     assertEquals("def", writer.getWorkbook().getSheetAt(0).rowIterator().next()
         .cellIterator().next().getStringCellValue());
     WorkbookWriter.openXLSX().addRow(new HSSFRichTextString("Hello!"),
@@ -195,17 +197,16 @@ public class WorkbookWriterTest {
   @Test
   public void testAddRowWithLong() {
     writer.addRow(214748364891234567L);
-    assertEquals("214748364891235000", writer.toReader().withoutHeader()
-        .toLists().iterator().next().get(0));
+    assertEquals("214748364891235000",
+        writer.toReader().withoutHeader().toLists().iterator().next().get(0));
   }
 
   @Test
   public void testSave() throws InvalidFormatException, IOException {
     writer.addRow("abc", "def");
     writer.save(RubyFile.join(BASE_DIR, "test.xls"));
-    WorkbookReader reader =
-        WorkbookReader.open(RubyFile.join(BASE_DIR, "test.xls"))
-            .withoutHeader();
+    WorkbookReader reader = WorkbookReader
+        .open(RubyFile.join(BASE_DIR, "test.xls")).withoutHeader();
     assertEquals("abc,def", reader.toCSV().iterator().next());
     reader.close();
     RubyFile.delete(RubyFile.join(BASE_DIR, "test.xls"));
@@ -218,15 +219,16 @@ public class WorkbookWriterTest {
 
   @Test
   public void testEquality() {
-    new EqualsTester().addEqualityGroup(writer, new WorkbookWriter(),
-        new WorkbookWriter()).testEquals();
+    new EqualsTester()
+        .addEqualityGroup(writer, new WorkbookWriter(), new WorkbookWriter())
+        .testEquals();
   }
 
   @Test
   public void testUnequality() {
     assertNotEquals(writer, new WorkbookWriter().addRow("123"));
-    assertNotEquals(writer.hashCode(), new WorkbookWriter().addRow("123")
-        .hashCode());
+    assertNotEquals(writer.hashCode(),
+        new WorkbookWriter().addRow("123").hashCode());
   }
 
   @Test

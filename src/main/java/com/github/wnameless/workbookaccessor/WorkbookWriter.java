@@ -61,8 +61,8 @@ public final class WorkbookWriter {
   private static final Logger log =
       LoggerFactory.getLogger(WorkbookWriter.class);
 
-  private static final String SHEET_EXISTED = "Sheet name is already existed.";
-  private static final String SHEET_NOT_FOUND = "Sheet name is not found.";
+  private static final String SHEET_EXISTED = "Sheet name is already existed";
+  private static final String SHEET_NOT_FOUND = "Sheet name is not found";
 
   private final Workbook workbook;
   private Sheet sheet;
