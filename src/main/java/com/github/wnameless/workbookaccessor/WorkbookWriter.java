@@ -58,8 +58,8 @@ import com.google.common.base.Objects;
 @RejectNull
 public final class WorkbookWriter {
 
-  private static final Logger log = LoggerFactory
-      .getLogger(WorkbookWriter.class);
+  private static final Logger log =
+      LoggerFactory.getLogger(WorkbookWriter.class);
 
   private static final String SHEET_EXISTED = "Sheet name is already existed.";
   private static final String SHEET_NOT_FOUND = "Sheet name is not found.";
@@ -113,8 +113,7 @@ public final class WorkbookWriter {
    */
   public WorkbookWriter(Workbook workbook) {
     this.workbook = workbook;
-    if (workbook.getNumberOfSheets() == 0)
-      workbook.createSheet();
+    if (workbook.getNumberOfSheets() == 0) workbook.createSheet();
     sheet = workbook.getSheetAt(0);
   }
 
@@ -246,8 +245,10 @@ public final class WorkbookWriter {
         else if (o instanceof Double)
           cell.setCellValue((Double) o);
         else if (o instanceof RichTextString)
-          if ((o instanceof HSSFRichTextString && workbook instanceof HSSFWorkbook)
-              || (o instanceof XSSFRichTextString && workbook instanceof XSSFWorkbook)) {
+          if ((o instanceof HSSFRichTextString
+              && workbook instanceof HSSFWorkbook)
+              || (o instanceof XSSFRichTextString
+                  && workbook instanceof XSSFWorkbook)) {
             cell.setCellValue((RichTextString) o);
           } else {
             cell.setCellValue(o.toString());
@@ -305,11 +306,11 @@ public final class WorkbookWriter {
 
   @Override
   public boolean equals(Object o) {
-    if (o instanceof WorkbookWriter) {
-      WorkbookWriter writer = (WorkbookWriter) o;
-      return Objects.equal(toReader(), writer.toReader());
-    }
-    return false;
+    if (o == this) return true;
+    if (o == null) return false;
+    if (!(o instanceof WorkbookWriter)) return false;
+    WorkbookWriter writer = (WorkbookWriter) o;
+    return Objects.equal(toReader(), writer.toReader());
   }
 
   @Override
