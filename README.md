@@ -11,7 +11,7 @@ The workbook-accessor provides you an easy and convenient way to manipulate work
 <dependency>
     <groupId>com.github.wnameless</groupId>
     <artifactId>workbook-accessor</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
 </dependency>
 ```
 

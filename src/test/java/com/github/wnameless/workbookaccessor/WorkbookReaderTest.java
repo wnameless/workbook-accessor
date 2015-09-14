@@ -140,7 +140,7 @@ public class WorkbookReaderTest {
   @Test
   public void testGetHeaderException() throws IOException {
     expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed.");
+    expectedEx.expectMessage("Workbook has been closed");
     readerNH.close();
     readerNH.getHeader();
   }
@@ -158,7 +158,7 @@ public class WorkbookReaderTest {
   @Test
   public void testGetSheetsException() throws IOException {
     expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed.");
+    expectedEx.expectMessage("Workbook has been closed");
     reader.close();
     reader.getAllSheetNames();
   }
@@ -187,7 +187,7 @@ public class WorkbookReaderTest {
   @Test
   public void testTurnToSheetException2() throws IOException {
     expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed.");
+    expectedEx.expectMessage("Workbook has been closed");
     reader.close();
     reader.turnToSheet(0);
   }
@@ -195,7 +195,7 @@ public class WorkbookReaderTest {
   @Test
   public void testTurnToSheetException3() throws IOException {
     expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed.");
+    expectedEx.expectMessage("Workbook has been closed");
     reader.close();
     reader.turnToSheet(0, false);
   }
@@ -203,14 +203,14 @@ public class WorkbookReaderTest {
   @Test
   public void testTurnToSheetException4() throws IOException {
     expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage("Sheet name is not found.");
+    expectedEx.expectMessage("Sheet name is not found");
     reader.turnToSheet("hahaha");
   }
 
   @Test
   public void testTurnToSheetException5() throws IOException {
     expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage("Sheet name is not found.");
+    expectedEx.expectMessage("Sheet name is not found");
     reader.turnToSheet("hahaha", true);
   }
 
@@ -243,7 +243,7 @@ public class WorkbookReaderTest {
   @Test
   public void testToListsException() throws IOException {
     expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed.");
+    expectedEx.expectMessage("Workbook has been closed");
     reader.close();
     reader.toLists();
   }
@@ -261,7 +261,7 @@ public class WorkbookReaderTest {
   @Test
   public void testToArraysException() throws IOException {
     expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed.");
+    expectedEx.expectMessage("Workbook has been closed");
     reader.close();
     reader.toArrays();
   }
@@ -278,7 +278,7 @@ public class WorkbookReaderTest {
   @Test
   public void testToMapsException1() {
     expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Header is not provided.");
+    expectedEx.expectMessage("Header is not provided");
     reader.turnToSheet(0, false);
     reader.toMaps();
   }
@@ -286,7 +286,7 @@ public class WorkbookReaderTest {
   @Test
   public void testToMapsException2() throws IOException {
     expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed.");
+    expectedEx.expectMessage("Workbook has been closed");
     reader.close();
     reader.toMaps();
   }

@@ -498,11 +498,11 @@ public final class WorkbookReader {
 
   @Override
   public boolean equals(Object o) {
-    if (o instanceof WorkbookReader) {
-      WorkbookReader reader = (WorkbookReader) o;
-      return Objects.equal(toMultimap(), reader.toMultimap());
-    }
-    return false;
+    if (o == this) return true;
+    if (o == null) return false;
+    if (!(o instanceof WorkbookReader)) return false;
+    WorkbookReader reader = (WorkbookReader) o;
+    return Objects.equal(toMultimap(), reader.toMultimap());
   }
 
   @Override
