@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless/workbook-accessor/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.wnameless/workbook-accessor)
+
 workbook-accessor
 =============
 A friendly workbook writer and reader for Java based on Apache POI
