@@ -172,6 +172,7 @@ public class WorkbookWriterTest {
     writer.createAndTurnToSheet("test");
   }
 
+  @SuppressWarnings("resource")
   @Test
   public void testAddRow() {
     Calendar cal = Calendar.getInstance();
