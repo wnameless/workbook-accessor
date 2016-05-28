@@ -29,6 +29,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -42,7 +44,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.wnameless.nullproof.annotation.RejectNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
@@ -52,11 +53,10 @@ import com.google.common.base.Objects;
  * friendly APIs for workbook writing.
  * 
  */
-@RejectNull
 public final class WorkbookWriter {
 
-  private static final Logger log =
-      LoggerFactory.getLogger(WorkbookWriter.class);
+  private static final Logger log = LoggerFactory
+      .getLogger(WorkbookWriter.class);
 
   private static final String SHEET_EXISTED = "Sheet name is already existed";
   private static final String SHEET_NOT_FOUND = "Sheet name is not found";
@@ -89,7 +89,7 @@ public final class WorkbookWriter {
    *          a {@link Workbook}
    * @return {@link WorkbookWriter}
    */
-  public static WorkbookWriter open(Workbook workbook) {
+  public static WorkbookWriter open(@NonNull Workbook workbook) {
     return new WorkbookWriter(workbook);
   }
 
@@ -108,7 +108,7 @@ public final class WorkbookWriter {
    * @param workbook
    *          a {@link Workbook}
    */
-  public WorkbookWriter(Workbook workbook) {
+  public WorkbookWriter(@NonNull Workbook workbook) {
     this.workbook = workbook;
     if (workbook.getNumberOfSheets() == 0) workbook.createSheet();
     sheet = workbook.getSheetAt(0);
@@ -126,7 +126,7 @@ public final class WorkbookWriter {
    *          of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter setSheetName(String name) {
+  public WorkbookWriter setSheetName(@NonNull String name) {
     workbook.setSheetName(workbook.getSheetIndex(sheet.getSheetName()), name);
     return this;
   }
@@ -169,7 +169,7 @@ public final class WorkbookWriter {
    *          of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter createSheet(String name) {
+  public WorkbookWriter createSheet(@NonNull String name) {
     checkArgument(!getAllSheetNames().contains(name), SHEET_EXISTED);
     workbook.createSheet(name);
     return this;
@@ -196,7 +196,7 @@ public final class WorkbookWriter {
    *          of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter turnToSheet(String name) {
+  public WorkbookWriter turnToSheet(@NonNull String name) {
     checkArgument(getAllSheetNames().contains(name), SHEET_NOT_FOUND);
     return turnToSheet(getAllSheetNames().indexOf(name));
   }
@@ -209,7 +209,7 @@ public final class WorkbookWriter {
    *          of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter createAndTurnToSheet(String name) {
+  public WorkbookWriter createAndTurnToSheet(@NonNull String name) {
     checkArgument(!getAllSheetNames().contains(name), SHEET_EXISTED);
     sheet = workbook.createSheet(name);
     return this;
@@ -222,7 +222,7 @@ public final class WorkbookWriter {
    *          an Iterable of Object
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter addRow(Iterable<? extends Object> fields) {
+  public WorkbookWriter addRow(@NonNull Iterable<? extends Object> fields) {
     Row row;
     if (sheet.getLastRowNum() == 0 && sheet.getPhysicalNumberOfRows() == 0)
       row = sheet.createRow(0);
@@ -242,10 +242,8 @@ public final class WorkbookWriter {
         else if (o instanceof Double)
           cell.setCellValue((Double) o);
         else if (o instanceof RichTextString)
-          if ((o instanceof HSSFRichTextString
-              && workbook instanceof HSSFWorkbook)
-              || (o instanceof XSSFRichTextString
-                  && workbook instanceof XSSFWorkbook)) {
+          if ((o instanceof HSSFRichTextString && workbook instanceof HSSFWorkbook)
+              || (o instanceof XSSFRichTextString && workbook instanceof XSSFWorkbook)) {
             cell.setCellValue((RichTextString) o);
           } else {
             cell.setCellValue(o.toString());
@@ -280,7 +278,7 @@ public final class WorkbookWriter {
    *          of the output file
    * @return saved File
    */
-  public File save(String path) {
+  public File save(@NonNull String path) {
     try {
       FileOutputStream out = new FileOutputStream(path);
       workbook.write(out);

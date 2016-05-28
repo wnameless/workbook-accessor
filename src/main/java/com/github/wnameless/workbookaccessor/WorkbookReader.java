@@ -33,6 +33,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import lombok.NonNull;
+import net.sf.rubycollect4j.RubyArray;
+import net.sf.rubycollect4j.RubyLazyEnumerator;
+import net.sf.rubycollect4j.block.TransformBlock;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -41,16 +46,10 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.wnameless.nullproof.annotation.AcceptNull;
-import com.github.wnameless.nullproof.annotation.RejectNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-
-import net.sf.rubycollect4j.RubyArray;
-import net.sf.rubycollect4j.RubyLazyEnumerator;
-import net.sf.rubycollect4j.block.TransformBlock;
 
 /**
  * 
@@ -58,11 +57,10 @@ import net.sf.rubycollect4j.block.TransformBlock;
  * friendly APIs for workbook reading.
  * 
  */
-@RejectNull
 public final class WorkbookReader {
 
-  private static final Logger log =
-      LoggerFactory.getLogger(WorkbookReader.class);
+  private static final Logger log = LoggerFactory
+      .getLogger(WorkbookReader.class);
 
   private static final String WORKBOOK_CLOSED = "Workbook has been closed";
   private static final String SHEET_NOT_FOUND = "Sheet name is not found";
@@ -82,7 +80,7 @@ public final class WorkbookReader {
    *          of a workbook
    * @return {@link WorkbookReader}
    */
-  public static WorkbookReader open(String path) {
+  public static WorkbookReader open(@NonNull String path) {
     return new WorkbookReader(path);
   }
 
@@ -93,7 +91,7 @@ public final class WorkbookReader {
    *          of a workbook
    * @return {@link WorkbookReader}
    */
-  public static WorkbookReader open(File file) {
+  public static WorkbookReader open(@NonNull File file) {
     return new WorkbookReader(file);
   }
 
@@ -104,7 +102,7 @@ public final class WorkbookReader {
    *          a {@link Workbook}
    * @return {@link WorkbookReader}
    */
-  public static WorkbookReader open(Workbook workbook) {
+  public static WorkbookReader open(@NonNull Workbook workbook) {
     return new WorkbookReader(workbook);
   }
 
@@ -115,7 +113,7 @@ public final class WorkbookReader {
    *          an {@link InputStream}
    * @return {@link WorkbookReader}
    */
-  public static WorkbookReader open(InputStream inputStream) {
+  public static WorkbookReader open(@NonNull InputStream inputStream) {
     return new WorkbookReader(inputStream);
   }
 
@@ -126,7 +124,7 @@ public final class WorkbookReader {
    * @param path
    *          of a workbook
    */
-  public WorkbookReader(String path) {
+  public WorkbookReader(@NonNull String path) {
     workbook = createWorkbook(new File(path));
     sheet = workbook.getSheetAt(0);
     setHeader();
@@ -139,7 +137,7 @@ public final class WorkbookReader {
    * @param file
    *          of a workbook
    */
-  public WorkbookReader(File file) {
+  public WorkbookReader(@NonNull File file) {
     workbook = createWorkbook(file);
     sheet = workbook.getSheetAt(0);
     setHeader();
@@ -152,7 +150,7 @@ public final class WorkbookReader {
    * @param workbook
    *          a {@link Workbook}
    */
-  public WorkbookReader(Workbook workbook) {
+  public WorkbookReader(@NonNull Workbook workbook) {
     this.workbook = workbook;
     if (workbook.getNumberOfSheets() == 0) workbook.createSheet();
     sheet = workbook.getSheetAt(0);
@@ -166,14 +164,14 @@ public final class WorkbookReader {
    * @param inputStream
    *          an {@link InputStream}
    */
-  public WorkbookReader(InputStream inputStream) {
+  public WorkbookReader(@NonNull InputStream inputStream) {
     this.workbook = createWorkbook(inputStream);
     if (workbook.getNumberOfSheets() == 0) workbook.createSheet();
     sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
-  private Workbook createWorkbook(File file) {
+  private Workbook createWorkbook(@NonNull File file) {
     try {
       is = new FileInputStream(file);
       return WorkbookFactory.create(is);
@@ -183,7 +181,7 @@ public final class WorkbookReader {
     }
   }
 
-  private Workbook createWorkbook(InputStream ins) {
+  private Workbook createWorkbook(@NonNull InputStream ins) {
     try {
       is = ins;
       return WorkbookFactory.create(is);
@@ -218,7 +216,8 @@ public final class WorkbookReader {
   private void setHeader() {
     header.clear();
     Iterator<Row> rows = sheet.rowIterator();
-    if (rows.hasNext() && hasHeader) header.addAll(rowToRubyArray(rows.next()));
+    if (rows.hasNext() && hasHeader)
+      header.addAll(rowToRubyArray(rows.next()));
   }
 
   /**
@@ -363,15 +362,16 @@ public final class WorkbookReader {
    */
   public Iterable<List<String>> toLists() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    RubyLazyEnumerator<List<String>> listsIterable = RubyLazyEnumerator
-        .of(sheet).map(new TransformBlock<Row, List<String>>() {
+    RubyLazyEnumerator<List<String>> listsIterable =
+        RubyLazyEnumerator.of(sheet).map(
+            new TransformBlock<Row, List<String>>() {
 
-          @Override
-          public List<String> yield(Row item) {
-            return rowToRubyArray(item);
-          }
+              @Override
+              public List<String> yield(Row item) {
+                return rowToRubyArray(item);
+              }
 
-        });
+            });
     return hasHeader ? listsIterable.drop(1) : listsIterable;
   }
 
@@ -440,7 +440,6 @@ public final class WorkbookReader {
   private TransformBlock<Cell, String> cell2Str(final boolean isCSV) {
     return new TransformBlock<Cell, String>() {
 
-      @AcceptNull
       @Override
       public String yield(Cell item) {
         if (item == null) return "";

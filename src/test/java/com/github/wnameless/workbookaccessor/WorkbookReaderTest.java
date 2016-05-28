@@ -31,6 +31,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import net.sf.rubycollect4j.RubyArray;
+import net.sf.rubycollect4j.RubyFile;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -44,9 +47,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.NullPointerTester;
-
-import net.sf.rubycollect4j.RubyArray;
-import net.sf.rubycollect4j.RubyFile;
 
 public class WorkbookReaderTest {
 
@@ -64,14 +64,18 @@ public class WorkbookReaderTest {
   @Before
   public void setUp() throws Exception {
     reader = new WorkbookReader(BASE_DIR + "PII_20130328154417.xls");
-    readerNH = WorkbookReader.open(BASE_DIR + "PII_20130328154417.xls")
-        .withoutHeader();
-    header = ra("編碼日期", "GUID", "MRN", "身份證字號", "姓氏", "名字", "出生月", "出生日", "出生年",
-        "聯絡電話", "性別", "收案醫師", "收案醫院名稱");
-    firstLine = ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890", "黃",
-        "小宜", "10", "19", "1979", "TEL0910,123,456", "", "李大華", "北榮");
-    firstLineCSV = ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890",
-        "黃", "小宜", "10", "19", "1979", "\"TEL0910,123,456\"", "", "李大華", "北榮");
+    readerNH =
+        WorkbookReader.open(BASE_DIR + "PII_20130328154417.xls")
+            .withoutHeader();
+    header =
+        ra("編碼日期", "GUID", "MRN", "身份證字號", "姓氏", "名字", "出生月", "出生日", "出生年",
+            "聯絡電話", "性別", "收案醫師", "收案醫院名稱");
+    firstLine =
+        ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890", "黃", "小宜",
+            "10", "19", "1979", "TEL0910,123,456", "", "李大華", "北榮");
+    firstLineCSV =
+        ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890", "黃", "小宜",
+            "10", "19", "1979", "\"TEL0910,123,456\"", "", "李大華", "北榮");
   }
 
   @Test
@@ -88,8 +92,8 @@ public class WorkbookReaderTest {
 
   @Test
   public void testAllPublicMethodsNPE() throws Exception {
-    new NullPointerTester()
-        .ignore(WorkbookReader.class.getDeclaredMethod("equals", Object.class))
+    new NullPointerTester().ignore(
+        WorkbookReader.class.getDeclaredMethod("equals", Object.class))
         .testAllPublicInstanceMethods(reader);
   }
 
@@ -102,20 +106,18 @@ public class WorkbookReaderTest {
   public void testConstructor() throws FileNotFoundException {
     assertTrue(reader instanceof WorkbookReader);
     assertTrue(readerNH instanceof WorkbookReader);
-    assertTrue(new WorkbookReader(new File(
-        BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
+    assertTrue(new WorkbookReader(new File(BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
     Workbook wb = new HSSFWorkbook();
     wb.createSheet();
     assertTrue(new WorkbookReader(wb) instanceof WorkbookReader);
     assertTrue(WorkbookReader.open(wb) instanceof WorkbookReader);
-    assertTrue(WorkbookReader.open(new File(
-        BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
     assertTrue(WorkbookReader
-        .open(BASE_DIR + "PII_20130328154417.xls") instanceof WorkbookReader);
-    assertTrue(new WorkbookReader(new FileInputStream(new File(
-        BASE_DIR + "PII_20130328154417.xls"))) instanceof WorkbookReader);
-    assertTrue(WorkbookReader.open(new FileInputStream(new File(
-        BASE_DIR + "PII_20130328154417.xls"))) instanceof WorkbookReader);
+        .open(new File(BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
+    assertTrue(WorkbookReader.open(BASE_DIR + "PII_20130328154417.xls") instanceof WorkbookReader);
+    assertTrue(new WorkbookReader(new FileInputStream(new File(BASE_DIR
+        + "PII_20130328154417.xls"))) instanceof WorkbookReader);
+    assertTrue(WorkbookReader.open(new FileInputStream(new File(BASE_DIR
+        + "PII_20130328154417.xls"))) instanceof WorkbookReader);
   }
 
   @Test(expected = RuntimeException.class)
@@ -162,13 +164,13 @@ public class WorkbookReaderTest {
 
   @Test
   public void testTurnToSheet() {
-    assertEquals("PII_20130328154417",
-        reader.turnToSheet(0).getCurrentSheetName());
-    assertEquals("PII_20130328154417",
-        reader.turnToSheet("PII_20130328154417").getCurrentSheetName());
+    assertEquals("PII_20130328154417", reader.turnToSheet(0)
+        .getCurrentSheetName());
+    assertEquals("PII_20130328154417", reader.turnToSheet("PII_20130328154417")
+        .getCurrentSheetName());
     assertEquals(ra(), reader.turnToSheet(0, false).getHeader());
-    assertEquals(ra(),
-        reader.turnToSheet("PII_20130328154417", false).getHeader());
+    assertEquals(ra(), reader.turnToSheet("PII_20130328154417", false)
+        .getHeader());
   }
 
   @Test
@@ -268,8 +270,7 @@ public class WorkbookReaderTest {
   public void testToMaps() {
     assertTrue(reader.toMaps() instanceof Iterable);
     assertEquals(9, ra(reader.toMaps()).count());
-    assertEquals(Hash(header.zip(firstLine)),
-        reader.toMaps().iterator().next());
+    assertEquals(Hash(header.zip(firstLine)), reader.toMaps().iterator().next());
   }
 
   @Test
@@ -293,10 +294,9 @@ public class WorkbookReaderTest {
     reader = new WorkbookReader(BASE_DIR + "jump_lines.xlsx");
     assertEquals(2, ra(reader.toLists()).size());
     assertEquals(ra("a", "", "c", "", "e", "", "g"), reader.getHeader());
-    assertEquals(ra("1", "", "3", "", "5", "", "7"),
-        ra(reader.toLists()).first());
-    assertEquals(ra("", "2", "", "4", "", "6", ""),
-        ra(reader.toLists()).last());
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists())
+        .first());
+    assertEquals(ra("", "2", "", "4", "", "6", ""), ra(reader.toLists()).last());
   }
 
   @Test
@@ -304,12 +304,10 @@ public class WorkbookReaderTest {
     reader = WorkbookReader.open(BASE_DIR + "jump_lines.xlsx").withoutHeader();
     assertEquals(3, ra(reader.toLists()).size());
     assertEquals(ra(), reader.getHeader());
-    assertEquals(ra("a", "", "c", "", "e", "", "g"),
-        ra(reader.toLists()).at(0));
-    assertEquals(ra("1", "", "3", "", "5", "", "7"),
-        ra(reader.toLists()).at(1));
-    assertEquals(ra("", "2", "", "4", "", "6", "", "8"),
-        ra(reader.toLists()).at(2));
+    assertEquals(ra("a", "", "c", "", "e", "", "g"), ra(reader.toLists()).at(0));
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists()).at(1));
+    assertEquals(ra("", "2", "", "4", "", "6", "", "8"), ra(reader.toLists())
+        .at(2));
   }
 
   @Test
@@ -317,10 +315,9 @@ public class WorkbookReaderTest {
     reader = new WorkbookReader(BASE_DIR + "jump_lines.xlsx").withHeader();
     assertEquals(2, ra(reader.toLists()).size());
     assertEquals(ra("a", "", "c", "", "e", "", "g"), reader.getHeader());
-    assertEquals(ra("1", "", "3", "", "5", "", "7"),
-        ra(reader.toLists()).first());
-    assertEquals(ra("", "2", "", "4", "", "6", ""),
-        ra(reader.toLists()).last());
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists())
+        .first());
+    assertEquals(ra("", "2", "", "4", "", "6", ""), ra(reader.toLists()).last());
   }
 
   @Test
@@ -328,20 +325,19 @@ public class WorkbookReaderTest {
     reader = new WorkbookReader(BASE_DIR + "jump_lines.xlsx").withoutHeader();
     assertEquals(3, ra(reader.toLists()).size());
     assertEquals(ra(), reader.getHeader());
-    assertEquals(ra("a", "", "c", "", "e", "", "g"),
-        ra(reader.toLists()).at(0));
-    assertEquals(ra("1", "", "3", "", "5", "", "7"),
-        ra(reader.toLists()).at(1));
-    assertEquals(ra("", "2", "", "4", "", "6", "", "8"),
-        ra(reader.toLists()).at(2));
+    assertEquals(ra("a", "", "c", "", "e", "", "g"), ra(reader.toLists()).at(0));
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists()).at(1));
+    assertEquals(ra("", "2", "", "4", "", "6", "", "8"), ra(reader.toLists())
+        .at(2));
   }
 
   @Test
   public void testSaveToDifferntFormat() {
     new WorkbookWriter(
         new WorkbookReader(BASE_DIR + "jump_lines.xlsx").getWorkbook())
-            .save(BASE_DIR + "jump_lines.xls");
-    assertEquals(ra(new WorkbookReader(BASE_DIR + "jump_lines.xlsx").toLists()),
+        .save(BASE_DIR + "jump_lines.xls");
+    assertEquals(
+        ra(new WorkbookReader(BASE_DIR + "jump_lines.xlsx").toLists()),
         ra(new WorkbookReader(BASE_DIR + "jump_lines.xls").toLists()));
     RubyFile.delete(BASE_DIR + "jump_lines.xls");
   }
@@ -351,6 +347,7 @@ public class WorkbookReaderTest {
     assertTrue(reader.toWriter() instanceof WorkbookWriter);
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testToMultimap() {
     Multimap<String, List<String>> content = ArrayListMultimap.create();
@@ -363,24 +360,24 @@ public class WorkbookReaderTest {
 
   @Test
   public void testEquality() {
-    new EqualsTester()
-        .addEqualityGroup(new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
-            new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
-            new WorkbookReader(BASE_DIR + "jump_lines.xlsx"))
-        .testEquals();
+    new EqualsTester().addEqualityGroup(
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx")).testEquals();
   }
 
   @Test
   public void testUnequality() {
     assertNotEquals(reader, new WorkbookReader(BASE_DIR + "jump_lines.xlsx"));
-    assertNotEquals(reader.hashCode(),
-        new WorkbookReader(BASE_DIR + "jump_lines.xlsx").hashCode());
+    assertNotEquals(reader.hashCode(), new WorkbookReader(BASE_DIR
+        + "jump_lines.xlsx").hashCode());
   }
 
   @Test
   public void testToString() {
-    assertEquals(MoreObjects.toStringHelper(WorkbookReader.class)
-        .addValue(reader.toMultimap()).toString(), reader.toString());
+    assertEquals(
+        MoreObjects.toStringHelper(WorkbookReader.class)
+            .addValue(reader.toMultimap()).toString(), reader.toString());
   }
 
 }
