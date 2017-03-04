@@ -40,15 +40,16 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.wnameless.workbookaccessor.util.DropIterable;
-import com.github.wnameless.workbookaccessor.util.IntegerSuccessor;
-import com.github.wnameless.workbookaccessor.util.RangeIterable;
-import com.github.wnameless.workbookaccessor.util.TransformBlock;
-import com.github.wnameless.workbookaccessor.util.TransformIterable;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Range;
 
 import lombok.NonNull;
 
@@ -343,17 +344,18 @@ public final class WorkbookReader {
    */
   public Iterable<String> toCSV() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    TransformIterable<Row, String> CSVIterable =
-        new TransformIterable<Row, String>(sheet,
-            new TransformBlock<Row, String>() {
+    Iterable<String> CSVIterable =
+        Iterables.transform(sheet, new Function<Row, String>() {
 
-              @Override
-              public String yield(Row item) {
-                return join(rowToList(item, true), ",");
-              }
+          Joiner joiner = Joiner.on(",").useForNull("");
 
-            });
-    return hasHeader ? new DropIterable<String>(CSVIterable, 1) : CSVIterable;
+          @Override
+          public String apply(Row item) {
+            return joiner.join(rowToList(item, true));
+          }
+
+        });
+    return hasHeader ? Iterables.skip(CSVIterable, 1) : CSVIterable;
   }
 
   /**
@@ -363,18 +365,16 @@ public final class WorkbookReader {
    */
   public Iterable<List<String>> toLists() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    TransformIterable<Row, List<String>> listsIterable =
-        new TransformIterable<Row, List<String>>(sheet,
-            new TransformBlock<Row, List<String>>() {
+    Iterable<List<String>> listsIterable =
+        Iterables.transform(sheet, new Function<Row, List<String>>() {
 
-              @Override
-              public List<String> yield(Row item) {
-                return rowToList(item);
-              }
+          @Override
+          public List<String> apply(Row item) {
+            return rowToList(item);
+          }
 
-            });
-    return hasHeader ? new DropIterable<List<String>>(listsIterable, 1)
-        : listsIterable;
+        });
+    return hasHeader ? Iterables.skip(listsIterable, 1) : listsIterable;
   }
 
   /**
@@ -384,19 +384,17 @@ public final class WorkbookReader {
    */
   public Iterable<String[]> toArrays() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    TransformIterable<Row, String[]> arraysIterable =
-        new TransformIterable<Row, String[]>(sheet,
-            new TransformBlock<Row, String[]>() {
+    Iterable<String[]> arraysIterable =
+        Iterables.transform(sheet, new Function<Row, String[]>() {
 
-              @Override
-              public String[] yield(Row item) {
-                List<String> list = rowToList(item);
-                return list.toArray(new String[list.size()]);
-              }
+          @Override
+          public String[] apply(Row item) {
+            List<String> list = rowToList(item);
+            return list.toArray(new String[list.size()]);
+          }
 
-            });
-    return hasHeader ? new DropIterable<String[]>(arraysIterable, 1)
-        : arraysIterable;
+        });
+    return hasHeader ? Iterables.skip(arraysIterable, 1) : arraysIterable;
   }
 
   /**
@@ -408,22 +406,20 @@ public final class WorkbookReader {
   public Iterable<Map<String, String>> toMaps() {
     checkState(!isClosed, WORKBOOK_CLOSED);
     checkState(hasHeader, NO_HEADER);
-    return new DropIterable<Map<String, String>>(
-        new TransformIterable<Row, Map<String, String>>(sheet,
-            new TransformBlock<Row, Map<String, String>>() {
+    return Iterables.skip(
+        Iterables.transform(sheet, new Function<Row, Map<String, String>>() {
 
-              @Override
-              public Map<String, String> yield(Row item) {
-                Map<String, String> map = new LinkedHashMap<String, String>();
-                List<String> row = rowToList(item);
-                for (int i = 0; i < getHeader().size(); i++) {
-                  map.put(getHeader().get(i), row.get(i));
-                }
-                return map;
-              }
+          @Override
+          public Map<String, String> apply(Row item) {
+            Map<String, String> map = new LinkedHashMap<String, String>();
+            List<String> row = rowToList(item);
+            for (int i = 0; i < getHeader().size(); i++) {
+              map.put(getHeader().get(i), row.get(i));
+            }
+            return map;
+          }
 
-            }),
-        1);
+        }), 1);
   }
 
   private List<String> rowToList(Row row) {
@@ -438,43 +434,30 @@ public final class WorkbookReader {
       colNum = row.getLastCellNum();
 
     List<String> list = new ArrayList<String>();
-    for (Cell cell : rangeMap(0, colNum - 1,
-        new TransformBlock<Integer, Cell>() {
+    for (Cell cell : Iterables.transform(range(0, colNum - 1),
+        new Function<Integer, Cell>() {
 
           @Override
-          public Cell yield(Integer item) {
+          public Cell apply(Integer item) {
             return row.getCell(item);
           }
 
         })) {
-      list.add(cell2Str(isCSV).yield(cell));
+      list.add(cell2Str(isCSV).apply(cell));
     }
     return list;
   }
 
-  private <E> Iterable<E> rangeMap(int start, int end,
-      TransformBlock<Integer, E> block) {
-    return new TransformIterable<Integer, E>(
-        new RangeIterable<Integer>(IntegerSuccessor.getInstance(), start, end),
-        block);
+  private ContiguousSet<Integer> range(int start, int end) {
+    return ContiguousSet.create(Range.closed(start, end),
+        DiscreteDomain.integers());
   }
 
-  private String join(List<?> list, String separator) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < list.size(); i++) {
-      if (i > 0) sb.append(separator);
-
-      Object item = list.get(i);
-      if (item != null) sb.append(item.toString());
-    }
-    return sb.toString();
-  }
-
-  private TransformBlock<Cell, String> cell2Str(final boolean isCSV) {
-    return new TransformBlock<Cell, String>() {
+  private Function<Cell, String> cell2Str(final boolean isCSV) {
+    return new Function<Cell, String>() {
 
       @Override
-      public String yield(Cell item) {
+      public String apply(Cell item) {
         if (item == null) return "";
 
         item.setCellType(CellType.STRING);
