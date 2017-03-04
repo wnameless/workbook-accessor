@@ -25,3 +25,6 @@ Version 1.2.2
 
 Version 1.2.3
 + Support using InputStream to create a WorkbookReader
+
+Version 1.3.0
+* Remove RubyCollect4J dependency

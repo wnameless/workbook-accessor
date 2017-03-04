@@ -20,25 +20,19 @@ package com.github.wnameless.workbookaccessor;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
-import static net.sf.rubycollect4j.RubyCollections.Hash;
-import static net.sf.rubycollect4j.RubyCollections.ra;
-import static net.sf.rubycollect4j.RubyCollections.range;
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.NonNull;
-import net.sf.rubycollect4j.RubyArray;
-import net.sf.rubycollect4j.RubyLazyEnumerator;
-import net.sf.rubycollect4j.block.TransformBlock;
-
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -46,10 +40,17 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.wnameless.workbookaccessor.util.DropIterable;
+import com.github.wnameless.workbookaccessor.util.IntegerSuccessor;
+import com.github.wnameless.workbookaccessor.util.RangeIterable;
+import com.github.wnameless.workbookaccessor.util.TransformBlock;
+import com.github.wnameless.workbookaccessor.util.TransformIterable;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+
+import lombok.NonNull;
 
 /**
  * 
@@ -59,8 +60,8 @@ import com.google.common.collect.ListMultimap;
  */
 public final class WorkbookReader {
 
-  private static final Logger log = LoggerFactory
-      .getLogger(WorkbookReader.class);
+  private static final Logger log =
+      LoggerFactory.getLogger(WorkbookReader.class);
 
   private static final String WORKBOOK_CLOSED = "Workbook has been closed";
   private static final String SHEET_NOT_FOUND = "Sheet name is not found";
@@ -216,8 +217,7 @@ public final class WorkbookReader {
   private void setHeader() {
     header.clear();
     Iterator<Row> rows = sheet.rowIterator();
-    if (rows.hasNext() && hasHeader)
-      header.addAll(rowToRubyArray(rows.next()));
+    if (rows.hasNext() && hasHeader) header.addAll(rowToList(rows.next()));
   }
 
   /**
@@ -249,7 +249,7 @@ public final class WorkbookReader {
    */
   public List<String> getHeader() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    return RubyArray.copyOf(header);
+    return new ArrayList<String>(header);
   }
 
   /**
@@ -298,7 +298,7 @@ public final class WorkbookReader {
    *          of a sheet
    * @return this {@link WorkbookReader}
    */
-  public WorkbookReader turnToSheet(String name) {
+  public WorkbookReader turnToSheet(@NonNull String name) {
     checkArgument(getAllSheetNames().contains(name), SHEET_NOT_FOUND);
     return turnToSheet(getAllSheetNames().indexOf(name));
   }
@@ -331,7 +331,7 @@ public final class WorkbookReader {
    *          true if spreadsheet has a header, false otherwise
    * @return this {@link WorkbookReader}
    */
-  public WorkbookReader turnToSheet(String name, boolean hasHeader) {
+  public WorkbookReader turnToSheet(@NonNull String name, boolean hasHeader) {
     checkArgument(getAllSheetNames().contains(name), SHEET_NOT_FOUND);
     return turnToSheet(getAllSheetNames().indexOf(name), hasHeader);
   }
@@ -343,16 +343,17 @@ public final class WorkbookReader {
    */
   public Iterable<String> toCSV() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    RubyLazyEnumerator<String> CSVIterable =
-        RubyLazyEnumerator.of(sheet).map(new TransformBlock<Row, String>() {
+    TransformIterable<Row, String> CSVIterable =
+        new TransformIterable<Row, String>(sheet,
+            new TransformBlock<Row, String>() {
 
-          @Override
-          public String yield(Row item) {
-            return rowToRubyArray(item, true).join(",");
-          }
+              @Override
+              public String yield(Row item) {
+                return join(rowToList(item, true), ",");
+              }
 
-        });
-    return hasHeader ? CSVIterable.drop(1) : CSVIterable;
+            });
+    return hasHeader ? new DropIterable<String>(CSVIterable, 1) : CSVIterable;
   }
 
   /**
@@ -362,17 +363,18 @@ public final class WorkbookReader {
    */
   public Iterable<List<String>> toLists() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    RubyLazyEnumerator<List<String>> listsIterable =
-        RubyLazyEnumerator.of(sheet).map(
+    TransformIterable<Row, List<String>> listsIterable =
+        new TransformIterable<Row, List<String>>(sheet,
             new TransformBlock<Row, List<String>>() {
 
               @Override
               public List<String> yield(Row item) {
-                return rowToRubyArray(item);
+                return rowToList(item);
               }
 
             });
-    return hasHeader ? listsIterable.drop(1) : listsIterable;
+    return hasHeader ? new DropIterable<List<String>>(listsIterable, 1)
+        : listsIterable;
   }
 
   /**
@@ -382,17 +384,19 @@ public final class WorkbookReader {
    */
   public Iterable<String[]> toArrays() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    RubyLazyEnumerator<String[]> arraysIterable =
-        RubyLazyEnumerator.of(sheet).map(new TransformBlock<Row, String[]>() {
+    TransformIterable<Row, String[]> arraysIterable =
+        new TransformIterable<Row, String[]>(sheet,
+            new TransformBlock<Row, String[]>() {
 
-          @Override
-          public String[] yield(Row item) {
-            List<String> list = rowToRubyArray(item);
-            return list.toArray(new String[list.size()]);
-          }
+              @Override
+              public String[] yield(Row item) {
+                List<String> list = rowToList(item);
+                return list.toArray(new String[list.size()]);
+              }
 
-        });
-    return hasHeader ? arraysIterable.drop(1) : arraysIterable;
+            });
+    return hasHeader ? new DropIterable<String[]>(arraysIterable, 1)
+        : arraysIterable;
   }
 
   /**
@@ -404,37 +408,66 @@ public final class WorkbookReader {
   public Iterable<Map<String, String>> toMaps() {
     checkState(!isClosed, WORKBOOK_CLOSED);
     checkState(hasHeader, NO_HEADER);
-    return RubyLazyEnumerator.of(sheet)
-        .map(new TransformBlock<Row, Map<String, String>>() {
+    return new DropIterable<Map<String, String>>(
+        new TransformIterable<Row, Map<String, String>>(sheet,
+            new TransformBlock<Row, Map<String, String>>() {
 
-          @SuppressWarnings("unchecked")
-          @Override
-          public Map<String, String> yield(Row item) {
-            return Hash(ra(getHeader()).zip(rowToRubyArray(item)));
-          }
+              @Override
+              public Map<String, String> yield(Row item) {
+                Map<String, String> map = new LinkedHashMap<String, String>();
+                List<String> row = rowToList(item);
+                for (int i = 0; i < getHeader().size(); i++) {
+                  map.put(getHeader().get(i), row.get(i));
+                }
+                return map;
+              }
 
-        }).drop(1);
+            }),
+        1);
   }
 
-  private RubyArray<String> rowToRubyArray(Row row) {
-    return rowToRubyArray(row, false);
+  private List<String> rowToList(Row row) {
+    return rowToList(row, false);
   }
 
-  private RubyArray<String> rowToRubyArray(final Row row, boolean isCSV) {
+  private List<String> rowToList(final Row row, boolean isCSV) {
     int colNum;
     if (hasHeader)
       colNum = sheet.rowIterator().next().getLastCellNum();
     else
       colNum = row.getLastCellNum();
 
-    return range(0, colNum - 1).map(new TransformBlock<Integer, Cell>() {
+    List<String> list = new ArrayList<String>();
+    for (Cell cell : rangeMap(0, colNum - 1,
+        new TransformBlock<Integer, Cell>() {
 
-      @Override
-      public Cell yield(Integer item) {
-        return row.getCell(item);
-      }
+          @Override
+          public Cell yield(Integer item) {
+            return row.getCell(item);
+          }
 
-    }).map(cell2Str(isCSV));
+        })) {
+      list.add(cell2Str(isCSV).yield(cell));
+    }
+    return list;
+  }
+
+  private <E> Iterable<E> rangeMap(int start, int end,
+      TransformBlock<Integer, E> block) {
+    return new TransformIterable<Integer, E>(
+        new RangeIterable<Integer>(IntegerSuccessor.getInstance(), start, end),
+        block);
+  }
+
+  private String join(List<?> list, String separator) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < list.size(); i++) {
+      if (i > 0) sb.append(separator);
+
+      Object item = list.get(i);
+      if (item != null) sb.append(item.toString());
+    }
+    return sb.toString();
   }
 
   private TransformBlock<Cell, String> cell2Str(final boolean isCSV) {
@@ -444,7 +477,7 @@ public final class WorkbookReader {
       public String yield(Cell item) {
         if (item == null) return "";
 
-        item.setCellType(CELL_TYPE_STRING);
+        item.setCellType(CellType.STRING);
         String val = item.toString();
         if (isCSV && val.contains(",")) {
           val = val.replaceAll("\"", "\"\"");
