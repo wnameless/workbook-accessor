@@ -35,7 +35,7 @@ writer.addRow(123, "abc", new Date())
       .save("path_of_the_output_file");
 ```
 
-## Feature
+## Features
 Works on multiple sheets.
 ```java
 reader.turnToSheet("Sheet0");
