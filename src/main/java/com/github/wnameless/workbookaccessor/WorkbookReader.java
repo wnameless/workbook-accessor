@@ -22,7 +22,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -175,8 +174,7 @@ public final class WorkbookReader {
 
   private Workbook createWorkbook(@NonNull File file) {
     try {
-      is = new FileInputStream(file);
-      return WorkbookFactory.create(is);
+      return WorkbookFactory.create(file);
     } catch (Exception e) {
       log.error(null, e);
       throw new RuntimeException(e);
