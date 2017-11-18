@@ -193,9 +193,9 @@ public class WorkbookWriterTest {
   }
 
   @Test
-  public void testAddRowWithLong() {
-    writer.addRow(214748364891234567L);
-    assertEquals("214748364891235000",
+  public void testAddRowWithDouble() {
+    writer.addRow(2.14540);
+    assertEquals("2.1454",
         writer.toReader().withoutHeader().toLists().iterator().next().get(0));
   }
 

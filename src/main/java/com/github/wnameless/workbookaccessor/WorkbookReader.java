@@ -458,12 +458,24 @@ public final class WorkbookReader {
       public String apply(Cell item) {
         if (item == null) return "";
 
-        item.setCellType(CellType.STRING);
-        String val = item.toString();
+        String val;
+        if (item.getCellTypeEnum() == CellType.NUMERIC) {
+          double v = item.getNumericCellValue();
+
+          if ((v == Math.floor(v)) && !Double.isInfinite(v)) {
+            val = Integer.valueOf((int) v).toString();
+          } else {
+            val = Double.toString(v);
+          }
+        } else {
+          val = item.toString();
+        }
+
         if (isCSV && val.contains(",")) {
           val = val.replaceAll("\"", "\"\"");
           return '"' + val + '"';
         }
+
         return val;
       }
 
