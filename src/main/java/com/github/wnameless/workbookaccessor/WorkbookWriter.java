@@ -29,8 +29,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -41,11 +39,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -53,10 +52,8 @@ import com.google.common.base.Objects;
  * friendly APIs for workbook writing.
  * 
  */
+@Slf4j
 public final class WorkbookWriter {
-
-  private static final Logger log = LoggerFactory
-      .getLogger(WorkbookWriter.class);
 
   private static final String SHEET_EXISTED = "Sheet name is already existed";
   private static final String SHEET_NOT_FOUND = "Sheet name is not found";
@@ -242,8 +239,10 @@ public final class WorkbookWriter {
         else if (o instanceof Double)
           cell.setCellValue((Double) o);
         else if (o instanceof RichTextString)
-          if ((o instanceof HSSFRichTextString && workbook instanceof HSSFWorkbook)
-              || (o instanceof XSSFRichTextString && workbook instanceof XSSFWorkbook)) {
+          if ((o instanceof HSSFRichTextString
+              && workbook instanceof HSSFWorkbook)
+              || (o instanceof XSSFRichTextString
+                  && workbook instanceof XSSFWorkbook)) {
             cell.setCellValue((RichTextString) o);
           } else {
             cell.setCellValue(o.toString());

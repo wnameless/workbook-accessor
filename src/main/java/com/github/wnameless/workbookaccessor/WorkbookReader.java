@@ -36,8 +36,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -51,6 +49,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -58,10 +57,8 @@ import lombok.NonNull;
  * friendly APIs for workbook reading.
  * 
  */
+@Slf4j
 public final class WorkbookReader {
-
-  private static final Logger log =
-      LoggerFactory.getLogger(WorkbookReader.class);
 
   private static final String WORKBOOK_CLOSED = "Workbook has been closed";
   private static final String SHEET_NOT_FOUND = "Sheet name is not found";
