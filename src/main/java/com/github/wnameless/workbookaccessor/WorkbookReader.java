@@ -20,13 +20,13 @@ package com.github.wnameless.workbookaccessor;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newLinkedHashMap;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -339,17 +339,9 @@ public final class WorkbookReader {
    */
   public Iterable<String> toCSV() {
     checkState(!isClosed, WORKBOOK_CLOSED);
+    Joiner joiner = Joiner.on(",").useForNull("");
     Iterable<String> CSVIterable =
-        Iterables.transform(sheet, new Function<Row, String>() {
-
-          Joiner joiner = Joiner.on(",").useForNull("");
-
-          @Override
-          public String apply(Row item) {
-            return joiner.join(rowToList(item, true));
-          }
-
-        });
+        Iterables.transform(sheet, item -> joiner.join(rowToList(item, true)));
     return hasHeader ? Iterables.skip(CSVIterable, 1) : CSVIterable;
   }
 
@@ -360,15 +352,9 @@ public final class WorkbookReader {
    */
   public Iterable<List<String>> toLists() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    Iterable<List<String>> listsIterable =
-        Iterables.transform(sheet, new Function<Row, List<String>>() {
-
-          @Override
-          public List<String> apply(Row item) {
-            return rowToList(item);
-          }
-
-        });
+    Iterable<List<String>> listsIterable = Iterables.transform(sheet, item -> {
+      return rowToList(item);
+    });
     return hasHeader ? Iterables.skip(listsIterable, 1) : listsIterable;
   }
 
@@ -379,16 +365,10 @@ public final class WorkbookReader {
    */
   public Iterable<String[]> toArrays() {
     checkState(!isClosed, WORKBOOK_CLOSED);
-    Iterable<String[]> arraysIterable =
-        Iterables.transform(sheet, new Function<Row, String[]>() {
-
-          @Override
-          public String[] apply(Row item) {
-            List<String> list = rowToList(item);
-            return list.toArray(new String[list.size()]);
-          }
-
-        });
+    Iterable<String[]> arraysIterable = Iterables.transform(sheet, item -> {
+      List<String> list = rowToList(item);
+      return list.toArray(new String[list.size()]);
+    });
     return hasHeader ? Iterables.skip(arraysIterable, 1) : arraysIterable;
   }
 
@@ -401,20 +381,14 @@ public final class WorkbookReader {
   public Iterable<Map<String, String>> toMaps() {
     checkState(!isClosed, WORKBOOK_CLOSED);
     checkState(hasHeader, NO_HEADER);
-    return Iterables.skip(
-        Iterables.transform(sheet, new Function<Row, Map<String, String>>() {
-
-          @Override
-          public Map<String, String> apply(Row item) {
-            Map<String, String> map = new LinkedHashMap<String, String>();
-            List<String> row = rowToList(item);
-            for (int i = 0; i < getHeader().size(); i++) {
-              map.put(getHeader().get(i), row.get(i));
-            }
-            return map;
-          }
-
-        }), 1);
+    return Iterables.skip(Iterables.transform(sheet, item -> {
+      Map<String, String> map = newLinkedHashMap();
+      List<String> row = rowToList(item);
+      for (int i = 0; i < getHeader().size(); i++) {
+        map.put(getHeader().get(i), row.get(i));
+      }
+      return map;
+    }), 1);
   }
 
   private List<String> rowToList(Row row) {
@@ -428,16 +402,9 @@ public final class WorkbookReader {
     else
       colNum = row.getLastCellNum();
 
-    List<String> list = new ArrayList<String>();
+    List<String> list = newArrayList();
     for (Cell cell : Iterables.transform(range(0, colNum - 1),
-        new Function<Integer, Cell>() {
-
-          @Override
-          public Cell apply(Integer item) {
-            return row.getCell(item);
-          }
-
-        })) {
+        i -> row.getCell(i))) {
       list.add(cell2Str(isCSV).apply(cell));
     }
     return list;
@@ -449,21 +416,16 @@ public final class WorkbookReader {
   }
 
   private Function<Cell, String> cell2Str(final boolean isCSV) {
-    return new Function<Cell, String>() {
+    return item -> {
+      if (item == null) return "";
 
-      @Override
-      public String apply(Cell item) {
-        if (item == null) return "";
-
-        item.setCellType(CellType.STRING);
-        String val = item.toString();
-        if (isCSV && val.contains(",")) {
-          val = val.replaceAll("\"", "\"\"");
-          return '"' + val + '"';
-        }
-        return val;
+      item.setCellType(CellType.STRING);
+      String val = item.toString();
+      if (isCSV && val.contains(",")) {
+        val = val.replaceAll("\"", "\"\"");
+        return '"' + val + '"';
       }
-
+      return val;
     };
   }
 

@@ -45,6 +45,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.NullPointerTester;
 
+import net.sf.rubycollect4j.Ruby;
 import net.sf.rubycollect4j.RubyArray;
 import net.sf.rubycollect4j.RubyFile;
 
@@ -263,12 +264,11 @@ public class WorkbookReaderTest {
     reader.toArrays();
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testToMaps() {
     assertTrue(reader.toMaps() instanceof Iterable);
     assertEquals(9, ra(reader.toMaps()).count());
-    assertEquals(Hash(header.zip(firstLine)),
+    assertEquals(Hash(header.zip(Ruby.Array.of(firstLine))),
         reader.toMaps().iterator().next());
   }
 
@@ -351,13 +351,12 @@ public class WorkbookReaderTest {
     assertTrue(reader.toWriter() instanceof WorkbookWriter);
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testToMultimap() {
     Multimap<String, List<String>> content = ArrayListMultimap.create();
-    content.put("工作表1", rs("a c e g").toA().mapǃ("trim"));
-    content.put("工作表1", rs("1 3 5 7").toA().mapǃ("trim"));
-    content.put("工作表1", rs(" 2 4 6 8").toA().mapǃ("trim"));
+    content.put("工作表1", rs("a c e g").eachChar().toA().map(String::trim));
+    content.put("工作表1", rs("1 3 5 7").eachChar().toA().map(String::trim));
+    content.put("工作表1", rs(" 2 4 6 8").eachChar().toA().map(String::trim));
     assertEquals(content,
         new WorkbookReader(BASE_DIR + "jump_lines.xlsx").toMultimap());
   }
