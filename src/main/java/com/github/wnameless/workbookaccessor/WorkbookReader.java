@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -65,6 +66,7 @@ public final class WorkbookReader {
   private static final String NO_HEADER = "Header is not provided";
 
   private final Workbook workbook;
+  private final DataFormatter formatter = new DataFormatter();
   private final List<String> header = newArrayList();
   private Sheet sheet;
   private boolean hasHeader = true;
@@ -391,6 +393,23 @@ public final class WorkbookReader {
     }), 1);
   }
 
+  /**
+   * Converts the backing {@link Workbook} of this spreadsheet to bytes.
+   * 
+   * @return {@link Workbook} in bytes
+   * @throws IOException
+   *           if anything cannot be written in bytes
+   */
+  public byte[] toBytes() throws IOException {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    try {
+      workbook.write(bos);
+    } finally {
+      bos.close();
+    }
+    return bos.toByteArray();
+  }
+
   private List<String> rowToList(Row row) {
     return rowToList(row, false);
   }
@@ -419,8 +438,7 @@ public final class WorkbookReader {
     return item -> {
       if (item == null) return "";
 
-      item.setCellType(CellType.STRING);
-      String val = item.toString();
+      String val = formatter.formatCellValue(item);
       if (isCSV && val.contains(",")) {
         val = val.replaceAll("\"", "\"\"");
         return '"' + val + '"';

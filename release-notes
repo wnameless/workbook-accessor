@@ -40,3 +40,6 @@ Version 1.3.3
 
 Version 1.4.0
 * Java 8 required
+
+Version 1.5.0
++ Add #toBytes

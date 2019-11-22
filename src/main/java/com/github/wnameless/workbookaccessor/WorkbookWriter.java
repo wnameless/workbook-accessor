@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -296,6 +297,23 @@ public final class WorkbookWriter {
    */
   public WorkbookReader toReader() {
     return new WorkbookReader(workbook);
+  }
+
+  /**
+   * Converts the backing {@link Workbook} of this spreadsheet to bytes.
+   * 
+   * @return {@link Workbook} in bytes
+   * @throws IOException
+   *           if anything cannot be written in bytes
+   */
+  public byte[] toBytes() throws IOException {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    try {
+      workbook.write(bos);
+    } finally {
+      bos.close();
+    }
+    return bos.toByteArray();
   }
 
   @Override

@@ -2,7 +2,7 @@
 
 workbook-accessor
 =============
-A friendly workbook writer and reader for Java based on Apache POI
+A friendly Java workbook writer and reader based on Apache POI
 
 ## Purpose
 Sometimes, you only need to do simple jobs with workbook files(Excel, Spreadsheet...).<br>
@@ -13,7 +13,7 @@ The workbook-accessor provides you an easy and convenient way to manipulate work
 <dependency>
     <groupId>com.github.wnameless</groupId>
     <artifactId>workbook-accessor</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 Since 1.4.0, Java 8 required.
@@ -43,7 +43,7 @@ reader.turnToSheet("Sheet0");
 writer.createAndTurnToSheet("NewSheet");
 ```
 
-More than one way to interate over the rows of a sheet.
+More than one way to iterate over the rows of a sheet.
 ```java
 reader.toCSV();    // Returns a Iterable<String>
 reader.toLists();  // Returns a Iterable<List<String>>
@@ -51,9 +51,8 @@ reader.toArrays(); // Returns a Iterable<String[]>
 reader.toMaps();   // Returns a Iterable<Map<String, String>>
 ```
 
-More than one way to add a new row to a sheet.
+Add a new row to a sheet in different ways.
 ```java
-
 writer.addRow(Arrays.asList("a", "b", "c")); // Accepts any Iterable
 writer.addRow(123, "abc", new Date());       // Object VarArgs
 ```
@@ -63,8 +62,19 @@ Retrieve whole content at once.
 WorkbookReader.open("path_to_workbook").toMultimap(); // {Sheet1=>[[123, abc, !@#], [4, 5, 6], [d, e, f]], Sheet2=>[...], ...}
 ```
 
-Interchangeable reader and writer
+Interchangeable reader and writer.
+
 ```java
 reader.toWriter();
 writer.toReader();
+```
+Get the backing Workbook or turn the Workbook into a byte array easily.
+```java
+Workbook workbook;
+workbook = reader.getWorkbook();
+workbook = writer.getWorkbook();
+
+byte[] workbookBytes;
+workbookBytes = reader.toBytes();
+workbookBytes = writer.toBytes();
 ```

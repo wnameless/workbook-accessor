@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -286,6 +287,18 @@ public class WorkbookReaderTest {
     expectedEx.expectMessage("Workbook has been closed");
     reader.close();
     reader.toMaps();
+  }
+
+  @Test
+  public void testToBytes() throws IOException {
+    Workbook wb = reader.getWorkbook();
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    try {
+      wb.write(bos);
+    } finally {
+      bos.close();
+    }
+    assertArrayEquals(bos.toByteArray(), reader.toBytes());
   }
 
   @Test
