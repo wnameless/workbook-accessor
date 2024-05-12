@@ -19,6 +19,8 @@ import static net.sf.rubycollect4j.RubyCollections.ra;
 import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import org.apache.poi.common.usermodel.HyperlinkType;
@@ -157,9 +159,11 @@ public class WorkbookWriterTest {
   public void testAddRow() {
     Calendar cal = Calendar.getInstance();
     Date date = new Date();
+    LocalDate localDate = LocalDate.now();
+    LocalDateTime localDateTime = LocalDateTime.now();
     writer.addRow("def");
-    writer.addRow(null, true, cal, date, 1.1, new HSSFRichTextString("Hello!"),
-        new XSSFRichTextString("World."),
+    writer.addRow(null, true, cal, date, localDate, localDateTime, 1.1,
+        new HSSFRichTextString("Hello!"), new XSSFRichTextString("World."),
         new HSSFWorkbook().getCreationHelper().createHyperlink(HyperlinkType.URL), 123, "abc");
     assertEquals("def", writer.getWorkbook().getSheetAt(0).rowIterator().next().cellIterator()
         .next().getStringCellValue());
@@ -167,7 +171,6 @@ public class WorkbookWriterTest {
         new XSSFRichTextString("World."));
     WorkbookWriter.openXLS().addRow(new HSSFRichTextString("Hello!"),
         new XSSFRichTextString("World."));
-
   }
 
   @Test

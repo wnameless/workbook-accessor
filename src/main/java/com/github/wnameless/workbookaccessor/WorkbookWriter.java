@@ -21,6 +21,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -229,6 +231,10 @@ public final class WorkbookWriter {
           cell.setCellValue((Calendar) o);
         else if (o instanceof Date)
           cell.setCellValue((Date) o);
+        else if (o instanceof LocalDate)
+          cell.setCellValue((LocalDate) o);
+        else if (o instanceof LocalDateTime)
+          cell.setCellValue((LocalDateTime) o);
         else if (o instanceof Double)
           cell.setCellValue((Double) o);
         else if (o instanceof RichTextString)

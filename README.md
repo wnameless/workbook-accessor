@@ -2,7 +2,7 @@
 
 workbook-accessor
 =============
-A friendly Java workbook writer and reader based on Apache POI
+A friendly Java workbook writer and reader based on Apache POI.
 
 ## Purpose
 Sometimes, you only need to do simple jobs with workbook files(Excel, Spreadsheet...).<br>
