@@ -261,21 +261,21 @@ public final class WorkbookWriter {
   /**
    * Adds a row to the sheet.
    * 
-   * @param fields a varargs of Object
-   * @return this {@link WorkbookWriter}
-   */
-  public WorkbookWriter addRow(Object... fields) {
-    return addRow(Arrays.asList(fields));
-  }
-
-  /**
-   * Adds a row to the sheet.
-   * 
    * @param fields a Stream of Object
    * @return this {@link WorkbookWriter}
    */
   public WorkbookWriter addRow(Stream<? extends Object> fields) {
     return addRow(fields.collect(Collectors.toList()));
+  }
+
+  /**
+   * Adds a row to the sheet.
+   * 
+   * @param fields a varargs of Object
+   * @return this {@link WorkbookWriter}
+   */
+  public WorkbookWriter addRow(Object... fields) {
+    return addRow(Arrays.asList(fields));
   }
 
   /**
