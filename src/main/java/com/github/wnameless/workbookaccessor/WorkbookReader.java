@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -340,6 +342,15 @@ public final class WorkbookReader {
   }
 
   /**
+   * Converts the spreadsheet to CSV by a String Stream.
+   * 
+   * @return String Stream
+   */
+  public Stream<String> toCSVStream() {
+    return StreamSupport.stream(toCSV().spliterator(), false);
+  }
+
+  /**
    * Converts the spreadsheet to String Lists by a List Iterable.
    * 
    * @return List of String Iterable
@@ -350,6 +361,15 @@ public final class WorkbookReader {
       return rowToList(item);
     });
     return hasHeader ? Iterables.skip(listsIterable, 1) : listsIterable;
+  }
+
+  /**
+   * Converts the spreadsheet to String Lists by a List Stream.
+   * 
+   * @return List of String Stream
+   */
+  public Stream<List<String>> toListsStream() {
+    return StreamSupport.stream(toLists().spliterator(), false);
   }
 
   /**
@@ -364,6 +384,15 @@ public final class WorkbookReader {
       return list.toArray(new String[list.size()]);
     });
     return hasHeader ? Iterables.skip(arraysIterable, 1) : arraysIterable;
+  }
+
+  /**
+   * Converts the spreadsheet to String Arrays by an Array Stream.
+   * 
+   * @return String array Stream
+   */
+  public Stream<String[]> toArraysStream() {
+    return StreamSupport.stream(toArrays().spliterator(), false);
   }
 
   /**
@@ -383,6 +412,16 @@ public final class WorkbookReader {
       }
       return map;
     }), 1);
+  }
+
+  /**
+   * Converts the spreadsheet to Maps by a Map Stream. All Maps are implemented by LinkedHashMap
+   * which implies the order of all fields is kept.
+   * 
+   * @return Map{@literal <String, String>} Stream
+   */
+  public Stream<Map<String, String>> toMapsStream() {
+    return StreamSupport.stream(toMaps().spliterator(), false);
   }
 
   /**

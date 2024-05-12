@@ -45,12 +45,17 @@ reader.turnToSheet("Sheet0");
 writer.createAndTurnToSheet("NewSheet");
 ```
 
-More than one way to iterate over the rows of a sheet.
+More than one way to iterate(stream) over the rows of a sheet.
 ```java
 reader.toCSV();    // Returns a Iterable<String>
 reader.toLists();  // Returns a Iterable<List<String>>
 reader.toArrays(); // Returns a Iterable<String[]>
 reader.toMaps();   // Returns a Iterable<Map<String, String>>
+
+reader.toCSVStream();    // Returns a Stream<String>
+reader.toListsStream();  // Returns a Stream<List<String>>
+reader.toArraysStream(); // Returns a Stream<String[]>
+reader.toMapsStream();   // Returns a Stream<Map<String, String>>
 ```
 
 Add a new row to a sheet in different ways.
