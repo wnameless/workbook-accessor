@@ -2,50 +2,37 @@
  *
  * Copyright 2013 Wei-Ming Wu
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  *
  */
 package com.github.wnameless.workbookaccessor;
 
-import static net.sf.rubycollect4j.RubyCollections.Hash;
-import static net.sf.rubycollect4j.RubyCollections.ra;
-import static net.sf.rubycollect4j.RubyCollections.rs;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
+import static net.sf.rubycollect4j.RubyCollections.*;
+import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.testing.EqualsTester;
 import com.google.common.testing.NullPointerTester;
-
 import net.sf.rubycollect4j.Ruby;
 import net.sf.rubycollect4j.RubyArray;
 import net.sf.rubycollect4j.RubyFile;
@@ -60,28 +47,17 @@ public class WorkbookReaderTest {
   private RubyArray<String> firstLine;
   private RubyArray<String> firstLineCSV;
 
-  @Rule
-  public ExpectedException expectedEx = ExpectedException.none();
-
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     reader = new WorkbookReader(BASE_DIR + "PII_20130328154417.xls");
-    readerNH = WorkbookReader.open(BASE_DIR + "PII_20130328154417.xls")
-        .withoutHeader();
-    header = ra("編碼日期", "GUID", "MRN", "身份證字號", "姓氏", "名字", "出生月", "出生日", "出生年",
-        "聯絡電話", "性別", "收案醫師", "收案醫院名稱");
-    firstLine = ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890", "黃",
-        "小宜", "10", "19", "1979", "TEL0910,123,456", "", "李大華", "北榮");
-    firstLineCSV = ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890",
-        "黃", "小宜", "10", "19", "1979", "\"TEL0910,123,456\"", "", "李大華", "北榮");
+    readerNH = WorkbookReader.open(BASE_DIR + "PII_20130328154417.xls").withoutHeader();
+    header = ra("編碼日期", "GUID", "MRN", "身份證字號", "姓氏", "名字", "出生月", "出生日", "出生年", "聯絡電話", "性別",
+        "收案醫師", "收案醫院名稱");
+    firstLine = ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890", "黃", "小宜", "10", "19",
+        "1979", "TEL0910,123,456", "", "李大華", "北榮");
+    firstLineCSV = ra("2013/03/28", "BIS-KJ415MTP", "A123456", "A286640890", "黃", "小宜", "10", "19",
+        "1979", "\"TEL0910,123,456\"", "", "李大華", "北榮");
   }
-
-  // @Test
-  // public void testNullProof() {
-  // expectedEx.expect(NullPointerException.class);
-  // expectedEx.expectMessage("Parameter<String> is not nullable");
-  // new WorkbookReader((String) null);
-  // }
 
   @Test
   public void testAllConstructorsNPE() {
@@ -90,8 +66,7 @@ public class WorkbookReaderTest {
 
   @Test
   public void testAllPublicMethodsNPE() throws Exception {
-    new NullPointerTester()
-        .ignore(WorkbookReader.class.getDeclaredMethod("equals", Object.class))
+    new NullPointerTester().ignore(WorkbookReader.class.getDeclaredMethod("equals", Object.class))
         .testAllPublicInstanceMethods(reader);
   }
 
@@ -104,25 +79,26 @@ public class WorkbookReaderTest {
   public void testConstructor() throws FileNotFoundException {
     assertTrue(reader instanceof WorkbookReader);
     assertTrue(readerNH instanceof WorkbookReader);
-    assertTrue(new WorkbookReader(new File(
-        BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
+    assertTrue(new WorkbookReader(
+        new File(BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
     Workbook wb = new HSSFWorkbook();
     wb.createSheet();
     assertTrue(new WorkbookReader(wb) instanceof WorkbookReader);
     assertTrue(WorkbookReader.open(wb) instanceof WorkbookReader);
-    assertTrue(WorkbookReader.open(new File(
-        BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
     assertTrue(WorkbookReader
-        .open(BASE_DIR + "PII_20130328154417.xls") instanceof WorkbookReader);
-    assertTrue(new WorkbookReader(new FileInputStream(new File(
-        BASE_DIR + "PII_20130328154417.xls"))) instanceof WorkbookReader);
-    assertTrue(WorkbookReader.open(new FileInputStream(new File(
-        BASE_DIR + "PII_20130328154417.xls"))) instanceof WorkbookReader);
+        .open(new File(BASE_DIR + "PII_20130328154417.xls")) instanceof WorkbookReader);
+    assertTrue(WorkbookReader.open(BASE_DIR + "PII_20130328154417.xls") instanceof WorkbookReader);
+    assertTrue(new WorkbookReader(new FileInputStream(
+        new File(BASE_DIR + "PII_20130328154417.xls"))) instanceof WorkbookReader);
+    assertTrue(WorkbookReader.open(new FileInputStream(
+        new File(BASE_DIR + "PII_20130328154417.xls"))) instanceof WorkbookReader);
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testConstructorException() {
-    new WorkbookReader("no_file.xls");
+    assertThrows(RuntimeException.class, () -> {
+      new WorkbookReader("no_file.xls");
+    });
   }
 
   @Test
@@ -138,10 +114,10 @@ public class WorkbookReaderTest {
 
   @Test
   public void testGetHeaderException() throws IOException {
-    expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed");
-    readerNH.close();
-    readerNH.getHeader();
+    assertThrows("Workbook has been closed", IllegalStateException.class, () -> {
+      readerNH.close();
+      readerNH.getHeader();
+    });
   }
 
   @Test
@@ -156,21 +132,19 @@ public class WorkbookReaderTest {
 
   @Test
   public void testGetSheetsException() throws IOException {
-    expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed");
-    reader.close();
-    reader.getAllSheetNames();
+    assertThrows("Workbook has been closed", IllegalStateException.class, () -> {
+      reader.close();
+      reader.getAllSheetNames();
+    });
   }
 
   @Test
   public void testTurnToSheet() {
-    assertEquals("PII_20130328154417",
-        reader.turnToSheet(0).getCurrentSheetName());
+    assertEquals("PII_20130328154417", reader.turnToSheet(0).getCurrentSheetName());
     assertEquals("PII_20130328154417",
         reader.turnToSheet("PII_20130328154417").getCurrentSheetName());
     assertEquals(ra(), reader.turnToSheet(0, false).getHeader());
-    assertEquals(ra(),
-        reader.turnToSheet("PII_20130328154417", false).getHeader());
+    assertEquals(ra(), reader.turnToSheet("PII_20130328154417", false).getHeader());
   }
 
   @Test
@@ -178,39 +152,41 @@ public class WorkbookReaderTest {
     WorkbookReader.open(new XSSFWorkbook()).close();
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testTurnToSheetException1() {
-    reader.turnToSheet(1);
+    assertThrows(IllegalArgumentException.class, () -> {
+      reader.turnToSheet(1);
+    });
   }
 
   @Test
   public void testTurnToSheetException2() throws IOException {
-    expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed");
-    reader.close();
-    reader.turnToSheet(0);
+    assertThrows("Workbook has been closed", IllegalStateException.class, () -> {
+      reader.close();
+      reader.turnToSheet(0);
+    });
   }
 
   @Test
   public void testTurnToSheetException3() throws IOException {
-    expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed");
-    reader.close();
-    reader.turnToSheet(0, false);
+    assertThrows("Workbook has been closed", IllegalStateException.class, () -> {
+      reader.close();
+      reader.turnToSheet(0, false);
+    });
   }
 
   @Test
   public void testTurnToSheetException4() throws IOException {
-    expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage("Sheet name is not found");
-    reader.turnToSheet("hahaha");
+    assertThrows("Sheet name is not found", IllegalArgumentException.class, () -> {
+      reader.turnToSheet("hahaha");
+    });
   }
 
   @Test
   public void testTurnToSheetException5() throws IOException {
-    expectedEx.expect(IllegalArgumentException.class);
-    expectedEx.expectMessage("Sheet name is not found");
-    reader.turnToSheet("hahaha", true);
+    assertThrows("Sheet name is not found", IllegalArgumentException.class, () -> {
+      reader.turnToSheet("hahaha", true);
+    });
   }
 
   @Test
@@ -223,10 +199,12 @@ public class WorkbookReaderTest {
     assertEquals(header.join(","), ra(readerNH.toCSV()).first());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testToCSVException() throws IOException {
-    reader.close();
-    reader.toCSV();
+    assertThrows(IllegalStateException.class, () -> {
+      reader.close();
+      reader.toCSV();
+    });
   }
 
   @Test
@@ -241,10 +219,10 @@ public class WorkbookReaderTest {
 
   @Test
   public void testToListsException() throws IOException {
-    expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed");
-    reader.close();
-    reader.toLists();
+    assertThrows("Workbook has been closed", IllegalStateException.class, () -> {
+      reader.close();
+      reader.toLists();
+    });
   }
 
   @Test
@@ -259,34 +237,33 @@ public class WorkbookReaderTest {
 
   @Test
   public void testToArraysException() throws IOException {
-    expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed");
-    reader.close();
-    reader.toArrays();
+    assertThrows("Workbook has been closed", IllegalStateException.class, () -> {
+      reader.close();
+      reader.toArrays();
+    });
   }
 
   @Test
   public void testToMaps() {
     assertTrue(reader.toMaps() instanceof Iterable);
     assertEquals(9, ra(reader.toMaps()).count());
-    assertEquals(Hash(header.zip(Ruby.Array.of(firstLine))),
-        reader.toMaps().iterator().next());
+    assertEquals(Hash(header.zip(Ruby.Array.of(firstLine))), reader.toMaps().iterator().next());
   }
 
   @Test
   public void testToMapsException1() {
-    expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Header is not provided");
-    reader.turnToSheet(0, false);
-    reader.toMaps();
+    assertThrows("Header is not provided", IllegalStateException.class, () -> {
+      reader.turnToSheet(0, false);
+      reader.toMaps();
+    });
   }
 
   @Test
   public void testToMapsException2() throws IOException {
-    expectedEx.expect(IllegalStateException.class);
-    expectedEx.expectMessage("Workbook has been closed");
-    reader.close();
-    reader.toMaps();
+    assertThrows("Workbook has been closed", IllegalStateException.class, () -> {
+      reader.close();
+      reader.toMaps();
+    });
   }
 
   @Test
@@ -306,10 +283,8 @@ public class WorkbookReaderTest {
     reader = new WorkbookReader(BASE_DIR + "jump_lines.xlsx");
     assertEquals(2, ra(reader.toLists()).size());
     assertEquals(ra("a", "", "c", "", "e", "", "g"), reader.getHeader());
-    assertEquals(ra("1", "", "3", "", "5", "", "7"),
-        ra(reader.toLists()).first());
-    assertEquals(ra("", "2", "", "4", "", "6", ""),
-        ra(reader.toLists()).last());
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists()).first());
+    assertEquals(ra("", "2", "", "4", "", "6", ""), ra(reader.toLists()).last());
   }
 
   @Test
@@ -317,12 +292,9 @@ public class WorkbookReaderTest {
     reader = WorkbookReader.open(BASE_DIR + "jump_lines.xlsx").withoutHeader();
     assertEquals(3, ra(reader.toLists()).size());
     assertEquals(ra(), reader.getHeader());
-    assertEquals(ra("a", "", "c", "", "e", "", "g"),
-        ra(reader.toLists()).at(0));
-    assertEquals(ra("1", "", "3", "", "5", "", "7"),
-        ra(reader.toLists()).at(1));
-    assertEquals(ra("", "2", "", "4", "", "6", "", "8"),
-        ra(reader.toLists()).at(2));
+    assertEquals(ra("a", "", "c", "", "e", "", "g"), ra(reader.toLists()).at(0));
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists()).at(1));
+    assertEquals(ra("", "2", "", "4", "", "6", "", "8"), ra(reader.toLists()).at(2));
   }
 
   @Test
@@ -330,10 +302,8 @@ public class WorkbookReaderTest {
     reader = new WorkbookReader(BASE_DIR + "jump_lines.xlsx").withHeader();
     assertEquals(2, ra(reader.toLists()).size());
     assertEquals(ra("a", "", "c", "", "e", "", "g"), reader.getHeader());
-    assertEquals(ra("1", "", "3", "", "5", "", "7"),
-        ra(reader.toLists()).first());
-    assertEquals(ra("", "2", "", "4", "", "6", ""),
-        ra(reader.toLists()).last());
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists()).first());
+    assertEquals(ra("", "2", "", "4", "", "6", ""), ra(reader.toLists()).last());
   }
 
   @Test
@@ -341,19 +311,15 @@ public class WorkbookReaderTest {
     reader = new WorkbookReader(BASE_DIR + "jump_lines.xlsx").withoutHeader();
     assertEquals(3, ra(reader.toLists()).size());
     assertEquals(ra(), reader.getHeader());
-    assertEquals(ra("a", "", "c", "", "e", "", "g"),
-        ra(reader.toLists()).at(0));
-    assertEquals(ra("1", "", "3", "", "5", "", "7"),
-        ra(reader.toLists()).at(1));
-    assertEquals(ra("", "2", "", "4", "", "6", "", "8"),
-        ra(reader.toLists()).at(2));
+    assertEquals(ra("a", "", "c", "", "e", "", "g"), ra(reader.toLists()).at(0));
+    assertEquals(ra("1", "", "3", "", "5", "", "7"), ra(reader.toLists()).at(1));
+    assertEquals(ra("", "2", "", "4", "", "6", "", "8"), ra(reader.toLists()).at(2));
   }
 
   @Test
   public void testSaveToDifferntFormat() {
-    new WorkbookWriter(
-        new WorkbookReader(BASE_DIR + "jump_lines.xlsx").getWorkbook())
-            .save(BASE_DIR + "jump_lines.xls");
+    new WorkbookWriter(new WorkbookReader(BASE_DIR + "jump_lines.xlsx").getWorkbook())
+        .save(BASE_DIR + "jump_lines.xls");
     assertEquals(ra(new WorkbookReader(BASE_DIR + "jump_lines.xlsx").toLists()),
         ra(new WorkbookReader(BASE_DIR + "jump_lines.xls").toLists()));
     RubyFile.delete(BASE_DIR + "jump_lines.xls");
@@ -370,30 +336,27 @@ public class WorkbookReaderTest {
     content.put("工作表1", rs("a c e g").eachChar().toA().map(String::trim));
     content.put("工作表1", rs("1 3 5 7").eachChar().toA().map(String::trim));
     content.put("工作表1", rs(" 2 4 6 8").eachChar().toA().map(String::trim));
-    assertEquals(content,
-        new WorkbookReader(BASE_DIR + "jump_lines.xlsx").toMultimap());
+    assertEquals(content, new WorkbookReader(BASE_DIR + "jump_lines.xlsx").toMultimap());
   }
 
   @Test
   public void testEquality() {
-    new EqualsTester()
-        .addEqualityGroup(new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
-            new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
-            new WorkbookReader(BASE_DIR + "jump_lines.xlsx"))
-        .testEquals();
+    new EqualsTester().addEqualityGroup(new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx"),
+        new WorkbookReader(BASE_DIR + "jump_lines.xlsx")).testEquals();
   }
 
   @Test
   public void testUnequality() {
     assertNotEquals(reader, new WorkbookReader(BASE_DIR + "jump_lines.xlsx"));
-    assertNotEquals(reader.hashCode(),
-        new WorkbookReader(BASE_DIR + "jump_lines.xlsx").hashCode());
+    assertNotEquals(reader.hashCode(), new WorkbookReader(BASE_DIR + "jump_lines.xlsx").hashCode());
   }
 
   @Test
   public void testToString() {
-    assertEquals(MoreObjects.toStringHelper(WorkbookReader.class)
-        .addValue(reader.toMultimap()).toString(), reader.toString());
+    assertEquals(
+        MoreObjects.toStringHelper(WorkbookReader.class).addValue(reader.toMultimap()).toString(),
+        reader.toString());
   }
 
 }

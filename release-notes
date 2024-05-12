@@ -43,3 +43,6 @@ Version 1.4.0
 
 Version 1.5.0
 + Add #toBytes
+
+Version 2.0.0
+* Java 11 required
