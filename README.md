@@ -17,7 +17,7 @@ The workbook-accessor provides you an easy and convenient way to manipulate work
 	  <!-- Newest version shows in the maven-central badge above -->
 </dependency>
 ```
-Since 2.0.0, Java 11 required.
+Since 2.0.0, Java 11 required.<br>
 Since 1.4.0, Java 8 required.
 
 ## Quick Start
