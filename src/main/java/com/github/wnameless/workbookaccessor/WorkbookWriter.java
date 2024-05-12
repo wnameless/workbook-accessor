@@ -2,25 +2,21 @@
  *
  * Copyright 2013 Wei-Ming Wu
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  *
  */
 package com.github.wnameless.workbookaccessor;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkElementIndex;
+import static com.google.common.base.Preconditions.*;
 import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,7 +25,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Objects;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -40,21 +36,19 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
-
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
- * {@link WorkbookWriter} is a wrapper to Apache POI. It tends to provide
- * friendly APIs for workbook writing.
+ * {@link WorkbookWriter} is a wrapper to Apache POI. It tends to provide friendly APIs for workbook
+ * writing.
  * 
  */
-@Slf4j
 public final class WorkbookWriter {
+
+  private static final Logger log = LoggerFactory.getLogger(WorkbookWriter.class);
 
   private static final String SHEET_EXISTED = "Sheet name is already existed";
   private static final String SHEET_NOT_FOUND = "Sheet name is not found";
@@ -83,17 +77,16 @@ public final class WorkbookWriter {
   /**
    * Returns a {@link WorkbookWriter} by given {@link Workbook}.
    * 
-   * @param workbook
-   *          a {@link Workbook}
+   * @param workbook a {@link Workbook}
    * @return {@link WorkbookWriter}
    */
-  public static WorkbookWriter open(@NonNull Workbook workbook) {
+  public static WorkbookWriter open(Workbook workbook) {
+    Objects.requireNonNull(workbook);
     return new WorkbookWriter(workbook);
   }
 
   /**
-   * Creates a {@link WorkbookWriter}. Default sheet name is Sheet0 and XLS
-   * format is used.
+   * Creates a {@link WorkbookWriter}. Default sheet name is Sheet0 and XLS format is used.
    */
   public WorkbookWriter() {
     workbook = new HSSFWorkbook();
@@ -103,10 +96,10 @@ public final class WorkbookWriter {
   /**
    * Creates a {@link WorkbookWriter} by given {@link Workbook}.
    * 
-   * @param workbook
-   *          a {@link Workbook}
+   * @param workbook a {@link Workbook}
    */
-  public WorkbookWriter(@NonNull Workbook workbook) {
+  public WorkbookWriter(Workbook workbook) {
+    Objects.requireNonNull(workbook);
     this.workbook = workbook;
     if (workbook.getNumberOfSheets() == 0) workbook.createSheet();
     sheet = workbook.getSheetAt(0);
@@ -120,11 +113,11 @@ public final class WorkbookWriter {
   /**
    * Sets current sheet name to given name.
    * 
-   * @param name
-   *          of a sheet
+   * @param name of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter setSheetName(@NonNull String name) {
+  public WorkbookWriter setSheetName(String name) {
+    Objects.requireNonNull(name);
     workbook.setSheetName(workbook.getSheetIndex(sheet.getSheetName()), name);
     return this;
   }
@@ -163,22 +156,21 @@ public final class WorkbookWriter {
   /**
    * Creates a new sheet.
    * 
-   * @param name
-   *          of a sheet
+   * @param name of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter createSheet(@NonNull String name) {
+  public WorkbookWriter createSheet(String name) {
+    Objects.requireNonNull(name);
     checkArgument(!getAllSheetNames().contains(name), SHEET_EXISTED);
     workbook.createSheet(name);
     return this;
   }
 
   /**
-   * Turns this {@link WorkbookWriter} to certain sheet. Sheet names can be
-   * found by {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookWriter} to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
-   * @param index
-   *          of a sheet
+   * @param index of a sheet
    * @return this {@link WorkbookWriter}
    */
   public WorkbookWriter turnToSheet(int index) {
@@ -190,24 +182,24 @@ public final class WorkbookWriter {
   /**
    * Creates a new sheet and turns this {@link WorkbookWriter} to the sheet.
    * 
-   * @param name
-   *          of a sheet
+   * @param name of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter turnToSheet(@NonNull String name) {
+  public WorkbookWriter turnToSheet(String name) {
+    Objects.requireNonNull(name);
     checkArgument(getAllSheetNames().contains(name), SHEET_NOT_FOUND);
     return turnToSheet(getAllSheetNames().indexOf(name));
   }
 
   /**
-   * Turns this {@link WorkbookWriter} to certain sheet. Sheet names can be
-   * found by {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookWriter} to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
-   * @param name
-   *          of a sheet
+   * @param name of a sheet
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter createAndTurnToSheet(@NonNull String name) {
+  public WorkbookWriter createAndTurnToSheet(String name) {
+    Objects.requireNonNull(name);
     checkArgument(!getAllSheetNames().contains(name), SHEET_EXISTED);
     sheet = workbook.createSheet(name);
     return this;
@@ -216,11 +208,11 @@ public final class WorkbookWriter {
   /**
    * Adds a row to the sheet.
    * 
-   * @param fields
-   *          an Iterable of Object
+   * @param fields an Iterable of Object
    * @return this {@link WorkbookWriter}
    */
-  public WorkbookWriter addRow(@NonNull Iterable<? extends Object> fields) {
+  public WorkbookWriter addRow(Iterable<? extends Object> fields) {
+    Objects.requireNonNull(fields);
     Row row;
     if (sheet.getLastRowNum() == 0 && sheet.getPhysicalNumberOfRows() == 0)
       row = sheet.createRow(0);
@@ -240,10 +232,8 @@ public final class WorkbookWriter {
         else if (o instanceof Double)
           cell.setCellValue((Double) o);
         else if (o instanceof RichTextString)
-          if ((o instanceof HSSFRichTextString
-              && workbook instanceof HSSFWorkbook)
-              || (o instanceof XSSFRichTextString
-                  && workbook instanceof XSSFWorkbook)) {
+          if ((o instanceof HSSFRichTextString && workbook instanceof HSSFWorkbook)
+              || (o instanceof XSSFRichTextString && workbook instanceof XSSFWorkbook)) {
             cell.setCellValue((RichTextString) o);
           } else {
             cell.setCellValue(o.toString());
@@ -263,8 +253,7 @@ public final class WorkbookWriter {
   /**
    * Adds a row to the sheet.
    * 
-   * @param fields
-   *          a varargs of Object
+   * @param fields a varargs of Object
    * @return this {@link WorkbookWriter}
    */
   public WorkbookWriter addRow(Object... fields) {
@@ -274,17 +263,17 @@ public final class WorkbookWriter {
   /**
    * Saves this {@link WorkbookWriter} to a file.
    * 
-   * @param path
-   *          of the output file
+   * @param path of the output file
    * @return saved File
    */
-  public File save(@NonNull String path) {
+  public File save(String path) {
+    Objects.requireNonNull(path);
     try {
       FileOutputStream out = new FileOutputStream(path);
       workbook.write(out);
       out.close();
     } catch (IOException e) {
-      log.error(null, e);
+      log.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
     return new File(path);
@@ -303,8 +292,7 @@ public final class WorkbookWriter {
    * Converts the backing {@link Workbook} of this spreadsheet to bytes.
    * 
    * @return {@link Workbook} in bytes
-   * @throws IOException
-   *           if anything cannot be written in bytes
+   * @throws IOException if anything cannot be written in bytes
    */
   public byte[] toBytes() throws IOException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -322,18 +310,17 @@ public final class WorkbookWriter {
     if (o == null) return false;
     if (!(o instanceof WorkbookWriter)) return false;
     WorkbookWriter writer = (WorkbookWriter) o;
-    return Objects.equal(toReader(), writer.toReader());
+    return Objects.equals(toReader(), writer.toReader());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(toReader());
+    return Objects.hash(toReader());
   }
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this).addValue(toReader().toMultimap())
-        .toString();
+    return MoreObjects.toStringHelper(this).addValue(toReader().toMultimap()).toString();
   }
 
 }

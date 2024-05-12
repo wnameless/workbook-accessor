@@ -2,26 +2,22 @@
  *
  * Copyright 2013 Wei-Ming Wu
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  *
  */
 package com.github.wnameless.workbookaccessor;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newLinkedHashMap;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -30,18 +26,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Objects;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
@@ -49,17 +45,15 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * 
- * {@link WorkbookReader} is a wrapper to Apache POI. It tends to provide
- * friendly APIs for workbook reading.
+ * {@link WorkbookReader} is a wrapper to Apache POI. It tends to provide friendly APIs for workbook
+ * reading.
  * 
  */
-@Slf4j
 public final class WorkbookReader {
+
+  private static final Logger log = LoggerFactory.getLogger(WorkbookReader.class);
 
   private static final String WORKBOOK_CLOSED = "Workbook has been closed";
   private static final String SHEET_NOT_FOUND = "Sheet name is not found";
@@ -67,7 +61,7 @@ public final class WorkbookReader {
 
   private final Workbook workbook;
   private final DataFormatter formatter = new DataFormatter();
-  private final List<String> header = newArrayList();
+  private final List<String> header = new ArrayList<>();
   private Sheet sheet;
   private boolean hasHeader = true;
   private boolean isClosed = false;
@@ -76,81 +70,81 @@ public final class WorkbookReader {
   /**
    * Creates a {@link WorkbookReader} by given path.
    * 
-   * @param path
-   *          of a workbook
+   * @param path of a workbook
    * @return {@link WorkbookReader}
    */
-  public static WorkbookReader open(@NonNull String path) {
+  public static WorkbookReader open(String path) {
+    Objects.requireNonNull(path);
     return new WorkbookReader(path);
   }
 
   /**
    * Creates a {@link WorkbookReader} by given file.
    * 
-   * @param file
-   *          of a workbook
+   * @param file of a workbook
    * @return {@link WorkbookReader}
    */
-  public static WorkbookReader open(@NonNull File file) {
+  public static WorkbookReader open(File file) {
+    Objects.requireNonNull(file);
     return new WorkbookReader(file);
   }
 
   /**
    * Creates a {@link WorkbookReader} by given {@link Workbook}.
    * 
-   * @param workbook
-   *          a {@link Workbook}
+   * @param workbook a {@link Workbook}
    * @return {@link WorkbookReader}
    */
-  public static WorkbookReader open(@NonNull Workbook workbook) {
+  public static WorkbookReader open(Workbook workbook) {
+    Objects.requireNonNull(workbook);
     return new WorkbookReader(workbook);
   }
 
   /**
    * Creates a {@link WorkbookReader} by given {@link InputStream}.
    * 
-   * @param inputStream
-   *          an {@link InputStream}
+   * @param inputStream an {@link InputStream}
    * @return {@link WorkbookReader}
    */
-  public static WorkbookReader open(@NonNull InputStream inputStream) {
+  public static WorkbookReader open(InputStream inputStream) {
+    Objects.requireNonNull(inputStream);
     return new WorkbookReader(inputStream);
   }
 
   /**
-   * Creates a {@link WorkbookReader} by given path. Assumes there is a header
-   * included in the spreadsheet.
+   * Creates a {@link WorkbookReader} by given path. Assumes there is a header included in the
+   * spreadsheet.
    * 
-   * @param path
-   *          of a workbook
+   * @param path of a workbook
    */
-  public WorkbookReader(@NonNull String path) {
+  public WorkbookReader(String path) {
+    Objects.requireNonNull(path);
     workbook = createWorkbook(new File(path));
     sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
   /**
-   * Creates a {@link WorkbookReader} by given File. Assumes there is a header
-   * included in the spreadsheet.
+   * Creates a {@link WorkbookReader} by given File. Assumes there is a header included in the
+   * spreadsheet.
    * 
-   * @param file
-   *          of a workbook
+   * @param file of a workbook
    */
-  public WorkbookReader(@NonNull File file) {
+  public WorkbookReader(File file) {
+    Objects.requireNonNull(file);
     workbook = createWorkbook(file);
     sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
   /**
-   * Creates a {@link WorkbookReader} by given {@link Workbook}. Assumes there
-   * is a header included in the spreadsheet.
+   * Creates a {@link WorkbookReader} by given {@link Workbook}. Assumes there is a header included
+   * in the spreadsheet.
    * 
-   * @param workbook
-   *          a {@link Workbook}
+   * @param workbook a {@link Workbook}
    */
-  public WorkbookReader(@NonNull Workbook workbook) {
+  public WorkbookReader(Workbook workbook) {
+    Objects.requireNonNull(workbook);
     this.workbook = workbook;
     if (workbook.getNumberOfSheets() == 0) workbook.createSheet();
     sheet = workbook.getSheetAt(0);
@@ -158,34 +152,36 @@ public final class WorkbookReader {
   }
 
   /**
-   * Creates a {@link WorkbookReader} by given {@link InputStream}. Assumes
-   * there is a header included in the spreadsheet.
+   * Creates a {@link WorkbookReader} by given {@link InputStream}. Assumes there is a header
+   * included in the spreadsheet.
    * 
-   * @param inputStream
-   *          an {@link InputStream}
+   * @param inputStream an {@link InputStream}
    */
-  public WorkbookReader(@NonNull InputStream inputStream) {
+  public WorkbookReader(InputStream inputStream) {
+    Objects.requireNonNull(inputStream);
     this.workbook = createWorkbook(inputStream);
     if (workbook.getNumberOfSheets() == 0) workbook.createSheet();
     sheet = workbook.getSheetAt(0);
     setHeader();
   }
 
-  private Workbook createWorkbook(@NonNull File file) {
+  private Workbook createWorkbook(File file) {
+    Objects.requireNonNull(file);
     try {
       return WorkbookFactory.create(file);
     } catch (Exception e) {
-      log.error(null, e);
+      log.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
   }
 
-  private Workbook createWorkbook(@NonNull InputStream ins) {
+  private Workbook createWorkbook(InputStream ins) {
+    Objects.requireNonNull(ins);
     try {
       is = ins;
       return WorkbookFactory.create(is);
     } catch (Exception e) {
-      log.error(null, e);
+      log.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
   }
@@ -234,7 +230,7 @@ public final class WorkbookReader {
     try {
       if (is != null) is.close();
     } catch (IOException e) {
-      log.error(null, e);
+      log.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
     isClosed = true;
@@ -274,11 +270,10 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
-   * found by {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
-   * @param index
-   *          of a sheet
+   * @param index of a sheet
    * @return this {@link WorkbookReader}
    */
   public WorkbookReader turnToSheet(int index) {
@@ -289,26 +284,24 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
-   * found by {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
-   * @param name
-   *          of a sheet
+   * @param name of a sheet
    * @return this {@link WorkbookReader}
    */
-  public WorkbookReader turnToSheet(@NonNull String name) {
+  public WorkbookReader turnToSheet(String name) {
+    Objects.requireNonNull(name);
     checkArgument(getAllSheetNames().contains(name), SHEET_NOT_FOUND);
     return turnToSheet(getAllSheetNames().indexOf(name));
   }
 
   /**
-   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
-   * found by {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
-   * @param index
-   *          of a sheet
-   * @param hasHeader
-   *          true if spreadsheet has a header, false otherwise
+   * @param index of a sheet
+   * @param hasHeader true if spreadsheet has a header, false otherwise
    * @return this {@link WorkbookReader}
    */
   public WorkbookReader turnToSheet(int index, boolean hasHeader) {
@@ -320,16 +313,15 @@ public final class WorkbookReader {
   }
 
   /**
-   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be
-   * found by {@link #getAllSheetNames}.
+   * Turns this {@link WorkbookReader} to certain sheet. Sheet names can be found by
+   * {@link #getAllSheetNames}.
    * 
-   * @param name
-   *          of a sheet
-   * @param hasHeader
-   *          true if spreadsheet has a header, false otherwise
+   * @param name of a sheet
+   * @param hasHeader true if spreadsheet has a header, false otherwise
    * @return this {@link WorkbookReader}
    */
-  public WorkbookReader turnToSheet(@NonNull String name, boolean hasHeader) {
+  public WorkbookReader turnToSheet(String name, boolean hasHeader) {
+    Objects.requireNonNull(name);
     checkArgument(getAllSheetNames().contains(name), SHEET_NOT_FOUND);
     return turnToSheet(getAllSheetNames().indexOf(name), hasHeader);
   }
@@ -375,8 +367,8 @@ public final class WorkbookReader {
   }
 
   /**
-   * Converts the spreadsheet to Maps by a Map Iterable. All Maps are
-   * implemented by LinkedHashMap which implies the order of all fields is kept.
+   * Converts the spreadsheet to Maps by a Map Iterable. All Maps are implemented by LinkedHashMap
+   * which implies the order of all fields is kept.
    * 
    * @return Map{@literal <String, String>} Iterable
    */
@@ -397,8 +389,7 @@ public final class WorkbookReader {
    * Converts the backing {@link Workbook} of this spreadsheet to bytes.
    * 
    * @return {@link Workbook} in bytes
-   * @throws IOException
-   *           if anything cannot be written in bytes
+   * @throws IOException if anything cannot be written in bytes
    */
   public byte[] toBytes() throws IOException {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -421,17 +412,15 @@ public final class WorkbookReader {
     else
       colNum = row.getLastCellNum();
 
-    List<String> list = newArrayList();
-    for (Cell cell : Iterables.transform(range(0, colNum - 1),
-        i -> row.getCell(i))) {
+    List<String> list = new ArrayList<>();
+    for (Cell cell : Iterables.transform(range(0, colNum - 1), i -> row.getCell(i))) {
       list.add(cell2Str(isCSV).apply(cell));
     }
     return list;
   }
 
   private ContiguousSet<Integer> range(int start, int end) {
-    return ContiguousSet.create(Range.closed(start, end),
-        DiscreteDomain.integers());
+    return ContiguousSet.create(Range.closed(start, end), DiscreteDomain.integers());
   }
 
   private Function<Cell, String> cell2Str(final boolean isCSV) {
@@ -457,9 +446,9 @@ public final class WorkbookReader {
   }
 
   /**
-   * Returns a {@link ListMultimap} which represents the content of this
-   * workbook. Each sheet name is used as the key, and the value is a Collection
-   * of String List which contains all fields of a row.
+   * Returns a {@link ListMultimap} which represents the content of this workbook. Each sheet name
+   * is used as the key, and the value is a Collection of String List which contains all fields of a
+   * row.
    * 
    * @return {@link ListMultimap}{@literal <String, List<String>>}
    */
@@ -489,7 +478,7 @@ public final class WorkbookReader {
     if (o == null) return false;
     if (!(o instanceof WorkbookReader)) return false;
     WorkbookReader reader = (WorkbookReader) o;
-    return Objects.equal(toMultimap(), reader.toMultimap());
+    return Objects.equals(toMultimap(), reader.toMultimap());
   }
 
   @Override
