@@ -60,7 +60,8 @@ reader.toMapsStream();   // Returns a Stream<Map<String, String>>
 
 Add a new row to a sheet in different ways.
 ```java
-writer.addRow(Arrays.asList("a", "b", "c")); // Accepts any Iterable
+writer.addRow(List.of("a", "b", "c")); // Accepts any Iterable
+writer.addRow(List.of("a", "b", "c").stream()); // Accepts any Stream
 writer.addRow(123, "abc", new Date());       // Object VarArgs
 ```
 

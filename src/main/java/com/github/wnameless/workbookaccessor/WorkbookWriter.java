@@ -28,6 +28,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -264,6 +266,16 @@ public final class WorkbookWriter {
    */
   public WorkbookWriter addRow(Object... fields) {
     return addRow(Arrays.asList(fields));
+  }
+
+  /**
+   * Adds a row to the sheet.
+   * 
+   * @param fields a Stream of Object
+   * @return this {@link WorkbookWriter}
+   */
+  public WorkbookWriter addRow(Stream<? extends Object> fields) {
+    return addRow(fields.collect(Collectors.toList()));
   }
 
   /**

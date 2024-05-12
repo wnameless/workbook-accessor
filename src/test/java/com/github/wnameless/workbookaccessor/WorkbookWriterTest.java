@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -161,6 +162,7 @@ public class WorkbookWriterTest {
     Date date = new Date();
     LocalDate localDate = LocalDate.now();
     LocalDateTime localDateTime = LocalDateTime.now();
+    writer.addRow(List.of("def").stream());
     writer.addRow("def");
     writer.addRow(null, true, cal, date, localDate, localDateTime, 1.1,
         new HSSFRichTextString("Hello!"), new XSSFRichTextString("World."),
