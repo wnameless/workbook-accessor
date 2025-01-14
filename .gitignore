@@ -5,3 +5,6 @@
 
 .DS_Store
 /doc
+
+### VS Code ###
+.vscode/
