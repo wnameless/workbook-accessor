@@ -46,3 +46,6 @@ Version 1.5.0
 
 Version 2.0.0
 * Java 11 required
+
+Version 2.0.1
+* Upgrade pom
